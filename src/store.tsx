@@ -1,0 +1,25 @@
+import { create } from 'zustand'
+import { devtools } from 'zustand/middleware'
+
+
+interface UserInfo {
+    id: number
+    email: string,
+    name: string,
+    role: string,
+}
+
+interface User {
+    user: UserInfo | null,
+    setUser: (user: UserInfo) => void
+    logoutUser: () => void
+}
+
+
+export const useAuthStore = create<User>()(devtools(
+    (set) => ({
+        user: null,
+        setUser: (user) => set({ user }),
+        logoutUser: () => set({ user: null }),
+    })))
+

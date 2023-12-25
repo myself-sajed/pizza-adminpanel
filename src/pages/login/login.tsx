@@ -3,6 +3,7 @@ import { LockOutlined, UserOutlined, } from '@ant-design/icons';
 import PizzaLogo from "../../components/icons/PizzaLogo";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { login, self } from "../../http/api";
+import { useAuthStore } from "../../store";
 
 const getSelf = async () => {
   const { data } = await self()
@@ -12,7 +13,9 @@ const getSelf = async () => {
 
 const LoginPage = () => {
 
-  const { data: selfData, refetch } = useQuery({
+  const { setUser } = useAuthStore()
+
+  const { refetch } = useQuery({
     queryKey: ['self'],
     queryFn: getSelf,
     enabled: false
@@ -20,13 +23,12 @@ const LoginPage = () => {
 
   const { mutate, isPending, isError, error } = useMutation({
     mutationFn: login,
-    onSuccess: (data) => {
-      refetch();
-      console.log('Login successful', data)
+    onSuccess: async () => {
+      let fetchedData = await refetch();
+      setUser(fetchedData.data)
     }
   })
 
-  console.log('Self Data: ', selfData)
 
 
   return (
