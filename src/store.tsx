@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
 
-interface UserInfo {
+export interface UserInfo {
     id: number
     email: string,
     name: string,
