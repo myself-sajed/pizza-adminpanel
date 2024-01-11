@@ -1,8 +1,8 @@
 const siteLinks = {
-    home: '/',
-    dashboard: '/',
-    login: '/auth/login',
-}
+  home: "/",
+  dashboard: "/",
+  login: "/auth/login",
+  orders: "/orders",
+};
 
-
-export default siteLinks
+export default siteLinks;

@@ -7,6 +7,11 @@ export interface UserInfo {
     email: string,
     name: string,
     role: string,
+    tenant: {
+        id: number,
+        name: string
+        address: string,
+    },
 }
 
 interface User {
