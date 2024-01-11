@@ -1,4 +1,4 @@
-import { Link, Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
 import { useAuthStore } from "../store"
 import siteLinks from "../siteLinks"
 
@@ -12,9 +12,6 @@ const NonAuth = () => {
 
     return (
         <div>
-            Non auth
-            <Link to={siteLinks.home} >Go to Home page</Link>
-
             <Outlet />
         </div>
     )
