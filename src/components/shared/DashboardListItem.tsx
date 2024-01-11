@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 
 interface IDashboardListItem {
     name: string,
@@ -6,10 +7,10 @@ interface IDashboardListItem {
     status: string
 }
 
-const colors: { [key: string]: string } = {
-    "Preparing": "blue",
-    "On the way": "red",
-    "Delivered": "green",
+const colors: { [key: string]: ReactElement } = {
+    "Preparing": <span className={`bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full`}>Preparing</span>,
+    "On the way": <span className={`bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full`}>On the way</span>,
+    "Delivered": <span className={`bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full`}>Delivered</span>,
 };
 
 
@@ -20,9 +21,11 @@ const DashboardListItem = ({ name, address, price, status }: IDashboardListItem)
                 <span className="font-medium">{name}</span>
                 <span className="text-gray-500 text-sm">{address}</span>
             </div>
-            <div className="flex items-start  gap-5">
+            <div className="grid grid-cols-2">
                 <span className="font-bold">₹ {price}</span>
-                <span className={`bg-${colors[status]}-100 text-${colors[status]}-700 rounded-full py-1 px-4 text-sm font-medium`}>{status}</span>
+                <div>
+                    {colors[status]}
+                </div>
             </div>
         </div>
     )

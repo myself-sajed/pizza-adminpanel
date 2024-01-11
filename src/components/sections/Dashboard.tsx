@@ -32,7 +32,7 @@ const Dashboard = () => {
                         title="Sales"
                         icon={<RiseOutlined className="text-blue-800 bg-blue-100 p-2 rounded-md" style={{ fontSize: 20 }} />}
                     >
-                        <img src="/assets/graph.png" alt="" />
+                        <img src="/assets/graph.png" alt="graph" className="w-full h-full object-cover" />
                     </DashboardCard>
                 </div>
                 <DashboardCard
