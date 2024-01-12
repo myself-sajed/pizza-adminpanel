@@ -56,7 +56,7 @@ const MainLayout = () => {
               }}>
               <Flex align="center" justify="space-between" style={{ width: '100%' }} >
                 <Tag bordered={false} color="volcano" style={{ marginLeft: collapsed ? '40px' : '0px' }} >
-                  {user.role === roles.admin ? "Global" : user.tenant.address}
+                  {user.role === roles.admin ? "Global" : user?.tenant?.address}
                 </Tag>
                 <Flex align="center" justify="space-end" gap={15} >
                   <Badge dot>
@@ -99,7 +99,7 @@ const items = [
   {
     key: "/",
     icon: <Icon component={HomeIcon} />,
-    label: <NavLink to={"/"}>Home</NavLink>
+    label: <NavLink to={"/"}>Dashboard</NavLink>
   },
   {
     key: "/users",

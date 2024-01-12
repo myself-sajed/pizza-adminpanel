@@ -4,6 +4,7 @@ import DashboardListItem from "../shared/DashboardListItem"
 import { Link } from "react-router-dom"
 import siteLinks from "../../siteLinks"
 import { useAuthStore } from "../../store"
+import Breds from "../shared/Breds"
 
 const Dashboard = () => {
 
@@ -11,8 +12,10 @@ const Dashboard = () => {
 
     return (
         <div>
+            <Breds items={[{ title: "Home", link: "" }, { title: "Dashboard", link: "null" }]} />
 
-            <p className="text-2xl font-bold">Welcome, {user?.name}</p>
+
+            <p className="text-2xl font-bold mt-4">Welcome, {user?.name}</p>
 
             <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-3">
