@@ -28,6 +28,9 @@ const MainLayout = () => {
     return <Navigate to={siteLinks.login} replace={true} />
   }
 
+  const items = getMenuItems(user.role)
+
+
 
   return (
     <div>
@@ -56,7 +59,7 @@ const MainLayout = () => {
               }}>
               <Flex align="center" justify="space-between" style={{ width: '100%' }} >
                 <Tag bordered={false} color="volcano" style={{ marginLeft: collapsed ? '40px' : '0px' }} >
-                  {user.role === roles.admin ? "Global" : user?.tenant?.address}
+                  {user.role === roles.admin ? "Global - Admin" : user?.tenant?.address}
                 </Tag>
                 <Flex align="center" justify="space-end" gap={15} >
                   <Badge dot>
@@ -95,32 +98,52 @@ const MainLayout = () => {
 export default MainLayout
 
 
-const items = [
+const baseItems = [
   {
+    id: 1,
     key: "/",
     icon: <Icon component={HomeIcon} />,
-    label: <NavLink to={"/"}>Dashboard</NavLink>
+    label: <NavLink to={"/"}>Dashboard</NavLink>,
   },
   {
-    key: "/users",
-    icon: <Icon component={UserIcon} />,
-    label: <NavLink to={"/users"}>Users</NavLink>
-  },
-  {
+    id: 3,
     key: "/restaurants",
     icon: <Icon component={FoodIcon} />,
-    label: <NavLink to={"/restaurants"}>Restaurants</NavLink>
+    label: <NavLink to={"/restaurants"}>Restaurants</NavLink>,
   },
   {
+    id: 4,
     key: "/products",
     icon: <Icon component={BasketIcon} />,
-    label: <NavLink to={"/products"}>Products</NavLink>
+    label: <NavLink to={"/products"}>Products</NavLink>,
   },
   {
+    id: 5,
     key: "/promos",
     icon: <Icon component={GiftIcon} />,
-    label: <NavLink to={"promos"}>Promos</NavLink>
+    label: <NavLink to={"promos"}>Promos</NavLink>,
   },
 
 ]
+
+const getMenuItems = (role: string) => {
+
+  let menu = baseItems
+
+  const userMenu = {
+    id: 2,
+    key: "/users",
+    icon: <Icon component={UserIcon} />,
+    label: <NavLink to={"/users"}>Users</NavLink>,
+  }
+
+  if (role === roles.admin) {
+    menu = [...menu, userMenu]
+  }
+
+  return menu.sort((a, b) => a.id - b.id)
+
+
+}
+
 

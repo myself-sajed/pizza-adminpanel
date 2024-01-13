@@ -1,9 +1,13 @@
-import Loading from "../shared/Loading"
 import Breds from "../shared/Breds"
 import { useQuery } from "@tanstack/react-query"
 import { getUsers } from "../../http/api"
 import { useAuthStore } from "../../store"
-import { Table, Tag } from "antd"
+import type { ColumnsType } from 'antd/es/table';
+import { roles } from "../../constants"
+import Table from "antd/es/table"
+import UserFilter from "../utility/UserFilter"
+import { Button, Drawer, Space, Tag } from "antd"
+import { useState } from "react"
 
 
 const Users = () => {
@@ -15,16 +19,50 @@ const Users = () => {
         queryFn: () => getUsers(user?.role === roles.admin ? 0 : Number(user?.tenant.id)),
     })
 
+    const [open, setOpen] = useState(false);
+
+    const showDrawer = () => {
+        setOpen(true);
+    }
+
+    const onClose = () => {
+        setOpen(false);
+    };
+
+    const getFilterData = (key: string, value: string) => {
+        console.log(key, value)
+    }
 
     return (
         <div>
             <Breds items={[{ title: "Home", link: "" }, { title: "Users", link: "null" }]} />
 
             <div className="mt-5">
-                {isLoading && <Loading title="Loading contents" />}
+                <UserFilter showDrawer={showDrawer} getFilterData={getFilterData} />
+                <Table rowKey={"id"} loading={isLoading} className="mt-4" columns={columns} dataSource={data?.data?.users} />
+            </div>
 
-                <Table columns={columns} dataSource={data?.data?.users} />
-
+            <div>
+                <Drawer
+                    destroyOnClose={true}
+                    title="Create a new user"
+                    width={650}
+                    onClose={(onClose)}
+                    open={open}
+                    styles={{
+                        body: {
+                            paddingBottom: 80,
+                        },
+                    }}
+                    extra={
+                        <Space>
+                            <Button onClick={onClose}>Cancel</Button>
+                            <Button onClick={onClose} type="primary">
+                                Submit
+                            </Button>
+                        </Space>
+                    }
+                ></Drawer>
             </div>
         </div>
     )
@@ -33,8 +71,7 @@ const Users = () => {
 export default Users
 
 
-import type { ColumnsType } from 'antd/es/table';
-import { roles } from "../../constants"
+
 
 interface DataType {
     id: number;
