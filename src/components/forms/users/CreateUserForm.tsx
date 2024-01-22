@@ -5,6 +5,7 @@ import { getTenants } from "../../../http/api";
 import { useQuery } from "@tanstack/react-query";
 
 const CreateUserForm = () => {
+
     const filterOption = (input: string, option?: { label: string; value: string }) =>
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
@@ -20,16 +21,15 @@ const CreateUserForm = () => {
                     <Card title="Basic Info">
                         <Row gutter={10}>
                             <Col span={12}>
-                                <Form.Item label="Full Name" rules={
-                                    [{ required: true, message: 'Please input an email' }]}>
+                                <Form.Item name="name" label="Full Name" rules={
+                                    [{ required: true, message: 'Please enter full name' }]}>
                                     <Input />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
-                                <Form.Item label="Email" rules={
+                                <Form.Item name="email" label="Email" rules={
                                     [{ required: true, message: 'Please input an email' },
-                                    { type: 'email', message: 'Please enter a valid email!' }
-                                    ]}>
+                                    { type: 'email', message: 'Please enter a valid email!' }]}>
                                     <Input type="email" />
                                 </Form.Item>
                             </Col>
@@ -40,15 +40,9 @@ const CreateUserForm = () => {
                     <Card title="Security">
                         <Row gutter={10}>
                             <Col span={12}>
-                                <Form.Item label="Create Password" rules={
+                                <Form.Item name="password" label="Create Password" rules={
                                     [{ required: true, message: 'Please input a password' }]}>
                                     <Input />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Confirm Password" rules={
-                                    [{ required: true, message: 'Please input password, again' }]}>
-                                    <Input type="email" />
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -61,6 +55,7 @@ const CreateUserForm = () => {
                                 <Form.Item
                                     name="role"
                                     label="Role"
+                                    rules={[{ required: true, message: "Select a role" }]}
                                 >
                                     <Select
                                         placeholder="Select a role"
@@ -74,19 +69,22 @@ const CreateUserForm = () => {
                             </Col>
                             <Col span={12}>
                                 <Form.Item
-                                    name="tenant"
+                                    name="tenantId"
                                     label="Tenant"
+                                    rules={[{ required: true, message: "Select a tenant" }]}
+
                                 >
                                     <Select
                                         loading={isLoading}
                                         showSearch
+                                        allowClear={true}
                                         placeholder="Select a tenant"
                                         optionFilterProp="children"
                                         filterOption={filterOption}
                                         options={
-                                            data?.data?.tenants?.map((item: { name: string }) => {
+                                            data?.data?.tenants?.map((item: { name: string, id: number }) => {
                                                 return {
-                                                    value: item.name,
+                                                    value: item.id,
                                                     label: item.name
                                                 }
                                             })

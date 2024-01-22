@@ -1,6 +1,6 @@
 import Breds from "../shared/Breds"
-import { useQuery } from "@tanstack/react-query"
-import { getUsers } from "../../http/api"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createUser, getUsers } from "../../http/api"
 import { useAuthStore } from "../../store"
 import type { ColumnsType } from 'antd/es/table';
 import { roles } from "../../constants"
@@ -9,9 +9,30 @@ import UserFilter from "../utility/UserFilter"
 import { Button, Drawer, Form, Space, Tag, theme } from "antd"
 import { useState } from "react"
 import CreateUserForm from "../forms/users/CreateUserForm";
+import { CreateUserData } from "../../types/login.types";
 
 
 const Users = () => {
+
+    const [form] = Form.useForm()
+    const queryClient = useQueryClient()
+
+    const { mutate: createUserMutate } = useMutation({
+        mutationKey: ['createUser'],
+        mutationFn: (userData: CreateUserData) => createUser(userData),
+        onSuccess: () => {
+            console.log('on success')
+            queryClient.invalidateQueries({ queryKey: ['user-list'] })
+        }
+    })
+
+    const handleFormSubmit = async () => {
+        await form.validateFields()
+        createUserMutate(form.getFieldsValue())
+        onClose()
+    }
+
+
 
     const { user } = useAuthStore()
     const { token: { colorBgLayout } } = theme.useToken();
@@ -29,6 +50,7 @@ const Users = () => {
     }
 
     const onClose = () => {
+        form.resetFields()
         setOpen(false);
     };
 
@@ -61,14 +83,14 @@ const Users = () => {
                     extra={
                         <Space>
                             <Button onClick={onClose}>Cancel</Button>
-                            <Button onClick={onClose} type="primary">
+                            <Button type="primary" onClick={handleFormSubmit} >
                                 Submit
                             </Button>
                         </Space>
                     }
                 >
 
-                    <Form layout="vertical">
+                    <Form layout="vertical" form={form} >
                         <CreateUserForm />
                     </Form>
 

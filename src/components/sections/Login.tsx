@@ -7,9 +7,6 @@ import { useAuthStore } from "../../store";
 import usePermission from "../../hooks/usePermission";
 import getSelf from "../../utility/getSelf";
 
-
-
-
 const LoginPage = () => {
 
   const { setUser, logoutUser } = useAuthStore()
