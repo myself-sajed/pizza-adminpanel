@@ -3,3 +3,5 @@ export const roles = {
   admin: "Admin",
   manager: "Manager",
 };
+
+export const PAGE_SIZE = 7;

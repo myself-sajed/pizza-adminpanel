@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createUser, getUsers } from "../../http/api"
 import { useAuthStore } from "../../store"
 import type { ColumnsType } from 'antd/es/table';
-import { roles } from "../../constants"
+import { PAGE_SIZE, roles } from "../../constants"
 import Table from "antd/es/table"
 import UserFilter from "../utility/UserFilter"
 import { Button, Drawer, Form, Space, Tag, theme } from "antd"
@@ -16,6 +16,10 @@ const Users = () => {
 
     const [form] = Form.useForm()
     const queryClient = useQueryClient()
+
+    const [queryParams, setQueryParams] = useState({
+        currentPage: 1, perPage: PAGE_SIZE
+    })
 
     const { mutate: createUserMutate } = useMutation({
         mutationKey: ['createUser'],
@@ -38,8 +42,11 @@ const Users = () => {
 
 
     const { data, isLoading } = useQuery({
-        queryKey: ['user-list'],
-        queryFn: () => getUsers(user?.role === roles.admin ? 0 : Number(user?.tenant.id)),
+        queryKey: ['user-list', queryParams],
+        queryFn: () => {
+            const params = new URLSearchParams(queryParams as unknown as Record<string, string>).toString()
+            return getUsers((user?.role === roles.admin ? 0 : Number(user?.tenant.id)), params)
+        },
     })
 
     const [open, setOpen] = useState(false);
@@ -63,7 +70,21 @@ const Users = () => {
 
             <div className="mt-5">
                 <UserFilter showDrawer={showDrawer} getFilterData={getFilterData} />
-                <Table rowKey={"id"} loading={isLoading} className="mt-4" columns={columns} dataSource={data?.data?.users} />
+                <Table rowKey={"id"} loading={isLoading} className="mt-4" columns={columns}
+                    dataSource={data?.data?.users?.users}
+                    pagination={
+                        {
+                            total: data?.data?.users?.count,
+                            pageSize: queryParams.perPage,
+                            current: queryParams.currentPage,
+                            onChange: (page: number) => {
+                                setQueryParams((prev) => {
+                                    return { ...prev, currentPage: page }
+                                })
+                            }
+                        }
+                    }
+                />
             </div>
 
             <div>

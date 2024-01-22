@@ -12,8 +12,8 @@ export const login = (credentials: Credentials) =>
 
 export const self = () => api.post("/auth/self");
 export const logout = () => api.post("/auth/logout");
-export const getUsers = (tenantId: number) =>
-  api.post("/user/list", { tenantId });
+export const getUsers = (tenantId: number, params: string) =>
+  api.post(`/user/list?${params}`, { tenantId });
 export const createUser = (userData: CreateUserData) =>
   api.post("/user/create", userData);
 
