@@ -1,14 +1,35 @@
 import Breds from "../shared/Breds"
-import { useQuery } from "@tanstack/react-query"
-import { getTenants } from "../../http/api"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { createTenant, getTenants } from "../../http/api"
 import type { ColumnsType } from 'antd/es/table';
 import Table from "antd/es/table"
-import { Button, Drawer, Space } from "antd"
+import { Button, Drawer, Form, Space } from "antd"
 import { useState } from "react"
 import RestoFilter from "../utility/RestoFilter";
+import CreateTenantForm from "../forms/tenants/CreateTenantForm";
+import { CreateTenantData } from "../../types/login.types";
 
 
 const Restaurants = () => {
+
+
+    const [form] = Form.useForm()
+    const queryClient = useQueryClient()
+
+    const { mutate: createUserMutate } = useMutation({
+        mutationKey: ['createTenant'],
+        mutationFn: (userData: CreateTenantData) => createTenant(userData),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tenant-list'] })
+        }
+    })
+
+    const handleFormSubmit = async () => {
+        await form.validateFields()
+        createUserMutate(form.getFieldsValue())
+        onClose()
+    }
+
 
     const { data, isLoading } = useQuery({
         queryKey: ['tenant-list'],
@@ -53,12 +74,16 @@ const Restaurants = () => {
                     extra={
                         <Space>
                             <Button onClick={onClose}>Cancel</Button>
-                            <Button onClick={onClose} type="primary">
+                            <Button type="primary" onClick={handleFormSubmit}>
                                 Submit
                             </Button>
                         </Space>
                     }
-                ></Drawer>
+                >
+                    <Form layout="vertical" form={form} >
+                        <CreateTenantForm />
+                    </Form>
+                </Drawer>
             </div>
         </div>
     )

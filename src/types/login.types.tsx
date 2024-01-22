@@ -11,3 +11,7 @@ export interface CreateUserData {
     tenantId: number;
     password: string;
 }
+export interface CreateTenantData {
+    name: string;
+    address: string;
+}

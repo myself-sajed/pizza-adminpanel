@@ -21,7 +21,6 @@ const Users = () => {
         mutationKey: ['createUser'],
         mutationFn: (userData: CreateUserData) => createUser(userData),
         onSuccess: () => {
-            console.log('on success')
             queryClient.invalidateQueries({ queryKey: ['user-list'] })
         }
     })
