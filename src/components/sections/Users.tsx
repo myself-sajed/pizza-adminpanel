@@ -6,13 +6,16 @@ import type { ColumnsType } from 'antd/es/table';
 import { roles } from "../../constants"
 import Table from "antd/es/table"
 import UserFilter from "../utility/UserFilter"
-import { Button, Drawer, Space, Tag } from "antd"
+import { Button, Drawer, Form, Space, Tag, theme } from "antd"
 import { useState } from "react"
+import CreateUserForm from "../forms/users/CreateUserForm";
 
 
 const Users = () => {
 
     const { user } = useAuthStore()
+    const { token: { colorBgLayout } } = theme.useToken();
+
 
     const { data, isLoading } = useQuery({
         queryKey: ['user-list'],
@@ -46,12 +49,13 @@ const Users = () => {
                 <Drawer
                     destroyOnClose={true}
                     title="Create a new user"
-                    width={650}
+                    width={600}
                     onClose={(onClose)}
                     open={open}
                     styles={{
                         body: {
                             paddingBottom: 80,
+                            backgroundColor: colorBgLayout
                         },
                     }}
                     extra={
@@ -62,7 +66,13 @@ const Users = () => {
                             </Button>
                         </Space>
                     }
-                ></Drawer>
+                >
+
+                    <Form layout="vertical">
+                        <CreateUserForm />
+                    </Form>
+
+                </Drawer>
             </div>
         </div>
     )
