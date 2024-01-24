@@ -11,7 +11,7 @@ const RestoFilter = ({ getFilterData, showDrawer }: FilterProps) => {
         <Card>
             <Flex align="center" justify="space-between" gap={5}>
                 <div className="grid grid-cols-3">
-                    <Input onChange={(e) => getFilterData("search", e.target.value)} style={{ width: "100%", }} allowClear={true} prefix={<SearchOutlined className="site-form-item-icon" />} placeholder="Search" />
+                    <Input onChange={(e) => getFilterData("qTerm", e.target.value)} style={{ width: "100%", }} allowClear={true} prefix={<SearchOutlined className="site-form-item-icon" />} placeholder="Search" />
                 </div>
                 <Button type='primary' icon={<UserAddOutlined />} onClick={showDrawer} >
                     Create tenat

@@ -8,6 +8,7 @@ import { useState } from "react"
 import RestoFilter from "../utility/RestoFilter";
 import CreateTenantForm from "../forms/tenants/CreateTenantForm";
 import { CreateTenantData } from "../../types/login.types";
+import { PAGE_SIZE } from "../../constants";
 
 
 const Restaurants = () => {
@@ -15,6 +16,10 @@ const Restaurants = () => {
 
     const [form] = Form.useForm()
     const queryClient = useQueryClient()
+
+    const [queryParams, setQueryParams] = useState({
+        currentPage: 1, perPage: PAGE_SIZE, qTerm: "", role: ""
+    })
 
     const { mutate: createUserMutate } = useMutation({
         mutationKey: ['createTenant'],
@@ -31,9 +36,13 @@ const Restaurants = () => {
     }
 
 
+
     const { data, isLoading } = useQuery({
-        queryKey: ['tenant-list'],
-        queryFn: () => getTenants(),
+        queryKey: ['tenant-list', queryParams],
+        queryFn: () => {
+            const query = new URLSearchParams(queryParams as unknown as Record<string, string>).toString()
+            return getTenants(query)
+        },
     })
 
     const [open, setOpen] = useState(false);
@@ -44,10 +53,14 @@ const Restaurants = () => {
 
     const onClose = () => {
         setOpen(false);
+        form.resetFields()
     };
 
     const getFilterData = (key: string, value: string) => {
         console.log(key, value)
+        setQueryParams((prev) => {
+            return { ...prev, [key]: value || "" }
+        })
     }
 
     return (
@@ -56,7 +69,23 @@ const Restaurants = () => {
 
             <div className="mt-5">
                 <RestoFilter showDrawer={showDrawer} getFilterData={getFilterData} />
-                <Table rowKey={"id"} loading={isLoading} className="mt-4" columns={columns} dataSource={data?.data?.tenants} />
+                <Table rowKey={"id"}
+                    loading={isLoading} className="mt-4"
+                    columns={columns}
+                    dataSource={data?.data?.tenants?.tenants}
+                    pagination={
+                        {
+                            total: data?.data?.tenants?.count,
+                            pageSize: queryParams.perPage,
+                            current: queryParams.currentPage,
+                            onChange: (page: number) => {
+                                setQueryParams((prev) => {
+                                    return { ...prev, currentPage: page }
+                                })
+                            }
+                        }
+                    }
+                />
             </div>
 
             <div>

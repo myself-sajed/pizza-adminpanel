@@ -17,6 +17,7 @@ export const getUsers = (tenantId: number, params: string) =>
 export const createUser = (userData: CreateUserData) =>
   api.post("/user/create", userData);
 
-export const getTenants = () => api.get("/tenant/getTenants");
+export const getTenants = (query: string) =>
+  api.get(`/tenant/getTenants?${query}`);
 export const createTenant = (tenantData: CreateTenantData) =>
   api.post("/tenant/create", tenantData);

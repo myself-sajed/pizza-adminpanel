@@ -16,7 +16,7 @@ export interface UserInfo {
 
 interface User {
     user: UserInfo | null,
-    setUser: (user: UserInfo) => void
+    setUser: (user: UserInfo | null) => void
     logoutUser: () => void
 }
 

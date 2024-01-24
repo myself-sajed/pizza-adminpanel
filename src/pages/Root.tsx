@@ -23,8 +23,10 @@ const Root = () => {
     })
 
     useEffect(() => {
-        if (data) {
+        if (data && data["id"]) {
             setUser(data)
+        } else {
+            setUser(null)
         }
     }, [data, setUser])
 
