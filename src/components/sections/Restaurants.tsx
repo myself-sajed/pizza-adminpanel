@@ -4,11 +4,12 @@ import { createTenant, getTenants } from "../../http/api"
 import type { ColumnsType } from 'antd/es/table';
 import Table from "antd/es/table"
 import { Button, Drawer, Form, Space } from "antd"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import RestoFilter from "../utility/RestoFilter";
 import CreateTenantForm from "../forms/tenants/CreateTenantForm";
 import { CreateTenantData } from "../../types/login.types";
 import { PAGE_SIZE } from "../../constants";
+import { debounce } from "lodash";
 
 
 const Restaurants = () => {
@@ -56,11 +57,16 @@ const Restaurants = () => {
         form.resetFields()
     };
 
+    const debouncedQueryUpdate = useMemo(() => {
+        return debounce((key: string, value: string) => {
+            setQueryParams((prev) => {
+                return { ...prev, [key]: value || "" }
+            })
+        }, 1000);
+    }, [])
+
     const getFilterData = (key: string, value: string) => {
-        console.log(key, value)
-        setQueryParams((prev) => {
-            return { ...prev, [key]: value || "" }
-        })
+        debouncedQueryUpdate(key, value)
     }
 
     return (

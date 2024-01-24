@@ -7,9 +7,10 @@ import { PAGE_SIZE, roles } from "../../constants"
 import Table from "antd/es/table"
 import UserFilter from "../utility/UserFilter"
 import { Button, Drawer, Form, Space, Tag, theme } from "antd"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import CreateUserForm from "../forms/users/CreateUserForm";
 import { CreateUserData } from "../../types/login.types";
+import { debounce } from "lodash";
 
 
 const Users = () => {
@@ -60,10 +61,25 @@ const Users = () => {
         setOpen(false);
     };
 
+    const debouncedQueryUpdate = useMemo(() => {
+        return debounce((key: string, value: string) => {
+            setQueryParams((prev) => {
+                return { ...prev, [key]: value || "" }
+            })
+        }, 1000);
+    }, [])
+
     const getFilterData = (key: string, value: string) => {
-        setQueryParams((prev) => {
-            return { ...prev, [key]: value || "" }
-        })
+
+        if (key === 'qTerm') {
+            debouncedQueryUpdate(key, value)
+        } else {
+            setQueryParams((prev) => {
+                return { ...prev, [key]: value || "" }
+            })
+        }
+
+
     }
 
 
