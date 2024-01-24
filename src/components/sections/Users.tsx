@@ -18,7 +18,7 @@ const Users = () => {
     const queryClient = useQueryClient()
 
     const [queryParams, setQueryParams] = useState({
-        currentPage: 1, perPage: PAGE_SIZE
+        currentPage: 1, perPage: PAGE_SIZE, qTerm: "", role: ""
     })
 
     const { mutate: createUserMutate } = useMutation({
@@ -61,7 +61,9 @@ const Users = () => {
     };
 
     const getFilterData = (key: string, value: string) => {
-        console.log(key, value)
+        setQueryParams((prev) => {
+            return { ...prev, [key]: value || "" }
+        })
     }
 
     return (

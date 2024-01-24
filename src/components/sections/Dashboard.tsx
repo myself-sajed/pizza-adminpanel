@@ -17,7 +17,7 @@ const Dashboard = () => {
 
             <p className="text-2xl font-bold mt-4">Welcome, {user?.name}</p>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid lg:grid-cols-2 grid-rows-2 gap-3">
                 <div className="flex flex-col gap-3">
                     <div className="flex gap-3">
                         <DashboardCard
