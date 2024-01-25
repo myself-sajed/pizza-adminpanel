@@ -9,7 +9,7 @@ import UserFilter from "../utility/UserFilter"
 import { Button, Drawer, Form, Space, Tag, theme } from "antd"
 import { useMemo, useState } from "react"
 import CreateUserForm from "../forms/users/CreateUserForm";
-import { CreateUserData } from "../../types/login.types";
+import { CreateTenantData, CreateUserData } from "../../types/login.types";
 import { debounce } from "lodash";
 
 
@@ -150,6 +150,7 @@ interface DataType {
     name: string;
     email: number;
     role: string;
+    tenant: CreateTenantData | null
 }
 
 const columns: ColumnsType<DataType> = [
@@ -178,6 +179,16 @@ const columns: ColumnsType<DataType> = [
                 <Tag color={role === roles.admin ? 'red' : 'blue'} key={id}>
                     {role}
                 </Tag>
+            </>
+        ),
+    },
+    {
+        title: 'Restaurant',
+        key: 'tenant',
+        dataIndex: 'tenant',
+        render: (tenant) => (
+            <>
+                {tenant?.name}
             </>
         ),
     },

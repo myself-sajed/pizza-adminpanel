@@ -1,0 +1,38 @@
+1. Auth service container: "docker run --rm -it -v ${PWD}:/usr/src/app -v /usr/src/app/node_modules --env-file ${PWD}/.env -p 5000:5000  auth-service:dev"
+
+2. PostgreSQL container: "docker run --rm --name pizza-pg-container -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v pizza-pgdata:/var/lib/postgresql/data -p 5432:5432 -d postgres"
+
+
+3. For running migration: npm run migration:run -- -d .\src\config\data-source.ts
+
+4. For generating migration file : npm run migration:generate -- src/migration/create_tenant_entity -d .\src\config\data-source.ts
+
+
+5. Running the production docker image: 
+
+docker run --env-file ${PWD}/.env.docker -e PRIVATE_KEY="-----BEGIN RSA PRIVATE KEY-----
+MIIEpQIBAAKCAQEAzNGJj7+Y5+L3rOYPEVPsjUuzL7b+/e6Gfp3F3lhfrfuWZ/po
+Y1DNClYoA03Tk8Ysx6KMl0LWYbnvuvEhNix4HGWCxIMOCjP3kxEwIBjUIyyjbg2h
+HjpMrSQDKdqkje7vbC2OOp/5DYQ2Vui4ltKXQKObHBvxngasFsILwuylDz+2QBL1
++DpjCDuoEr9IksAc499DeeV3NleX4sGao2miw7ryvWHXpfJpNCw5o/RR/qsB8qkE
+Z2qt//ipGiQDv7+bIoxLEUKe59F96rPdaprThDJD78LfJEH/PcR9cFQBwnZDJmuw
+tCJAsZrOhqrsq5RrwL1qml+VNpC7Tdbanw3r8wIDAQABAoIBADznkiBMuQs7Uqr3
+PkPI0O6zM/VcVTbtVtEP2WbkoI774R3KOIBP5qjMNdnFqsSmiWpTy7qvBVDKGZ9d
+VKLnVlAbX2dQETy3d0ckNUtWFr7e5zoyk1aJv4M80jP/8C7Efi2M3l5Qc56xUfdF
+/J3cwV1XSShypsZ29XVO/nBYLjz6DOCs0lWbvpEqW7PmrMdY33hHvVEYBgsJtLP7
+DPbYVPNcAdd58QqSsXqtjgEcLuf167452UlZby7YZ9lUj8j20jNHC1KM7J/mbESp
+bBjS4tcroUibRGx3q2DdkOa9NckK8AXi3ZMRe6ViI4oHWwrASF+BuAXK0clUGK31
+/q6jXgECgYEA6gmv7mzXryhfsk+8KgFakR47mV0o12rt9/Q3dwfkQTRHMe2re7UC
+sIUmKTdFU3Eizeyrx5iqRarqFImJLXsMx7C/PgbnfcxCB4/iukzxjxSOSQN4csmI
+/zvD7RDDBMlHQ1p1i/6onBY3l4LQNfxPqWq474CeDRUtT4BoVwYFtZkCgYEA4Anp
+S5xveAN5AY4D84HE4OFJ2AaZAooMunHn3gNH2niHpunUg2VT0brOdmEzMp+LTqlv
+r/HQ5lT1D39qy8q0/cSzbWMnb4v3jVQ6AeC44K2p9t+5pdefC3SksRrcsuhcEaa4
+uaYk9QQWK+0DAG4sjBy3PuPpk6LISAtz0ArsTWsCgYEAggxJ/6HppAI6Uvoto+XG
+rrbvBUSYCkP34f2JyJHRC06CdUMNNBucV/xU/TgiRMCsR2NI/QtfKoFTu3/Fg0lK
+C7iyPERX5DZZRpx0r3NME2anvfi4uIg2oSVTtOrIg2NZPxsIEHe8t6c80us0yZrf
+pVORWjzNFpX67J9820aUa5kCgYEAiCYdy6BWsVVS7Rnz1sCO96aRbKGdzMg+MfPU
+17ugp+jFby78wZkLVhIzNAefyGziiLw5LnBC5ibNAk0Jhq06TlmCPMCcD5K8rvt3
+gPqi/48qEegl9t3RPnH1P9e2NVc11FhAPDn2jZudKbaQM2vA0KkGx0ZUBS9QjU/A
+Yrawod8CgYEAi+/o/eDd5NMX4S+/890r3FQl23uiHKOfZ6Aw3wTBWyNIqTmcdMx+
+mV66wo57iVBTI2JFJHmy4Yg/bI6DlRLuLRlCPWTaaC9MT8/BEabKkGHAxclMkeEw
+bhRLDCqVBtTA9FGWgFOlP8TBXy6hghZ7t2nZajn6UcwEG1plb5jmqLM=-----END RSA PRIVATE KEY-----" -p 5000:5000 myselfsajed/pizza-authservice:build-12
