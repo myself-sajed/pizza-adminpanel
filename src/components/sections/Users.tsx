@@ -64,9 +64,9 @@ const Users = () => {
     const debouncedQueryUpdate = useMemo(() => {
         return debounce((key: string, value: string) => {
             setQueryParams((prev) => {
-                return { ...prev, [key]: value || "" }
+                return { ...prev, [key]: value || "", currentPage: 1 }
             })
-        }, 1000);
+        }, 500);
     }, [])
 
     const getFilterData = (key: string, value: string) => {
@@ -75,7 +75,7 @@ const Users = () => {
             debouncedQueryUpdate(key, value)
         } else {
             setQueryParams((prev) => {
-                return { ...prev, [key]: value || "" }
+                return { ...prev, [key]: value || "", currentPage: 1 }
             })
         }
 
