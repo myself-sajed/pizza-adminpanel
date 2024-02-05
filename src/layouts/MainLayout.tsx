@@ -1,4 +1,4 @@
-import { NavLink, Navigate, Outlet } from "react-router-dom"
+import { NavLink, Navigate, Outlet, useLocation } from "react-router-dom"
 import { useAuthStore } from "../store"
 import siteLinks from "../siteLinks"
 import { Avatar, Badge, Dropdown, Flex, Layout, Menu, Tag, theme } from "antd"
@@ -23,9 +23,10 @@ const MainLayout = () => {
   const { user } = useAuthStore()
   const { token: { colorBgContainer } } = theme.useToken();
   const { logoutMutate } = useLogout()
+  const location = useLocation()
 
   if (!user) {
-    return <Navigate to={siteLinks.login} replace={true} />
+    return <Navigate to={`${siteLinks.login}?returnTo=${location.pathname}`} replace={true} />
   }
 
   const items = getMenuItems(user.role)
@@ -45,7 +46,7 @@ const MainLayout = () => {
               <PizzaLogo />
             </div>
 
-            <Menu theme="light" defaultSelectedKeys={['/']} mode="inline" items={items} />
+            <Menu theme="light" defaultSelectedKeys={[location.pathname]} mode="inline" items={items} />
           </Sider>
           <Layout>
             <Header
@@ -106,12 +107,6 @@ const baseItems = [
     label: <NavLink to={"/"}>Dashboard</NavLink>,
   },
   {
-    id: 3,
-    key: "/restaurants",
-    icon: <Icon component={FoodIcon} />,
-    label: <NavLink to={"/restaurants"}>Restaurants</NavLink>,
-  },
-  {
     id: 4,
     key: "/products",
     icon: <Icon component={BasketIcon} />,
@@ -130,15 +125,23 @@ const getMenuItems = (role: string) => {
 
   let menu = baseItems
 
-  const userMenu = {
-    id: 2,
-    key: "/users",
-    icon: <Icon component={UserIcon} />,
-    label: <NavLink to={"/users"}>Users</NavLink>,
-  }
+  const authUserMenu = [
+    {
+      id: 2,
+      key: "/users",
+      icon: <Icon component={UserIcon} />,
+      label: <NavLink to={"/users"}>Users</NavLink>,
+    },
+    {
+      id: 3,
+      key: "/restaurants",
+      icon: <Icon component={FoodIcon} />,
+      label: <NavLink to={"/restaurants"}>Restaurants</NavLink>,
+    },
+  ]
 
   if (role === roles.admin) {
-    menu = [...menu, userMenu]
+    menu = [...menu, ...authUserMenu]
   }
 
   return menu.sort((a, b) => a.id - b.id)
