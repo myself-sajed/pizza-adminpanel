@@ -1,13 +1,14 @@
-import { Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet, useLocation } from "react-router-dom"
 import { useAuthStore } from "../store"
-import siteLinks from "../siteLinks"
 
 const NonAuth = () => {
 
     const { user } = useAuthStore()
+    const location = useLocation()
+    const returnTo = new URLSearchParams(location.search).get('returnTo') || '/'
 
     if (user) {
-        return <Navigate to={siteLinks.home} replace={true} />
+        return <Navigate to={returnTo} replace={true} />
     }
 
     return (
