@@ -36,3 +36,9 @@ export const getAllTenantList = () => api.get(`/tenant/getAllTenantList`);
 
 export const createTenant = (tenantData: CreateTenantData) =>
   api.post("/tenant/create", tenantData);
+
+export const updateTenant = (tenantDetails: CreateTenantData) =>
+  api.post("/tenant/updateTenant", {
+    tenantToUpdate: tenantDetails.id,
+    detailsToUpdate: tenantDetails,
+  });

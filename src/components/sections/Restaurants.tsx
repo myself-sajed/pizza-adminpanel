@@ -1,10 +1,10 @@
 import Breds from "../shared/Breds"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createTenant, getTenants } from "../../http/api"
+import { createTenant, getTenants, updateTenant } from "../../http/api"
 import type { ColumnsType } from 'antd/es/table';
 import Table from "antd/es/table"
 import { Button, Drawer, Form, Space } from "antd"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import RestoFilter from "../utility/RestoFilter";
 import CreateTenantForm from "../forms/tenants/CreateTenantForm";
 import { CreateTenantData } from "../../types/login.types";
@@ -17,12 +17,13 @@ const Restaurants = () => {
 
     const [form] = Form.useForm()
     const queryClient = useQueryClient()
+    const [editingTenant, setEditingTenant] = useState<DataType | null>(null)
 
     const [queryParams, setQueryParams] = useState({
         currentPage: 1, perPage: PAGE_SIZE, qTerm: "", role: ""
     })
 
-    const { mutate: createUserMutate } = useMutation({
+    const { mutate: createTenantMutate } = useMutation({
         mutationKey: ['createTenant'],
         mutationFn: (userData: CreateTenantData) => createTenant(userData),
         onSuccess: () => {
@@ -30,11 +31,32 @@ const Restaurants = () => {
         }
     })
 
+    const { mutate: updateTenantMutate } = useMutation({
+        mutationKey: ['updateTenant'],
+        mutationFn: (tenantDetails: CreateTenantData) => updateTenant(tenantDetails),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['tenant-list'] })
+        }
+    })
+
     const handleFormSubmit = async () => {
         await form.validateFields()
-        createUserMutate(form.getFieldsValue())
+        if (editingTenant) {
+            updateTenantMutate({ ...form.getFieldsValue(), id: editingTenant.id, })
+        } else {
+            createTenantMutate(form.getFieldsValue())
+        }
         onClose()
     }
+
+    useEffect(() => {
+
+        if (editingTenant) {
+            console.log(editingTenant)
+            form.setFieldsValue(editingTenant)
+            showDrawer()
+        }
+    }, [editingTenant, form])
 
 
 
@@ -54,6 +76,7 @@ const Restaurants = () => {
 
     const onClose = () => {
         setOpen(false);
+        setEditingTenant(null)
         form.resetFields()
     };
 
@@ -77,7 +100,16 @@ const Restaurants = () => {
                 <RestoFilter showDrawer={showDrawer} getFilterData={getFilterData} />
                 <Table rowKey={"id"}
                     loading={isLoading} className="mt-4"
-                    columns={columns}
+                    columns={[...columns, {
+                        title: 'Action',
+                        key: 'action',
+                        dataIndex: 'action',
+                        render: (_: string, tenant: DataType) => (
+                            <>
+                                <Button onClick={() => setEditingTenant(tenant)} type="link">Edit</Button>
+                            </>
+                        ),
+                    }]}
                     dataSource={data?.data?.tenants?.tenants}
                     pagination={
                         {
@@ -98,7 +130,7 @@ const Restaurants = () => {
             <div>
                 <Drawer
                     destroyOnClose={true}
-                    title="Create a new tenant"
+                    title={editingTenant ? "Update tenant" : "Create a new tenant"}
                     width={650}
                     onClose={(onClose)}
                     open={open}
@@ -133,8 +165,7 @@ interface DataType {
     id: number;
     key: string;
     name: string;
-    email: number;
-    role: string;
+    address: string;
 }
 
 const columns: ColumnsType<DataType> = [

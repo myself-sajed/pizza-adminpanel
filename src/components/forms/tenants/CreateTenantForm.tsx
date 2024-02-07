@@ -17,7 +17,7 @@ const CreateTenantForm = () => {
                             <Col span={12}>
                                 <Form.Item name="address" label="Address" rules={
                                     [{ required: true, message: 'Please enter a valid address' }]}>
-                                    <Input type="email" />
+                                    <Input />
                                 </Form.Item>
                             </Col>
                         </Row>
