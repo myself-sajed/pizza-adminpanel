@@ -1,13 +1,13 @@
 import Breds from "../shared/Breds"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createUser, getUsers } from "../../http/api"
+import { createUser, getUsers, updateUser } from "../../http/api"
 import { useAuthStore } from "../../store"
 import type { ColumnsType } from 'antd/es/table';
 import { PAGE_SIZE, roles } from "../../constants"
 import Table from "antd/es/table"
 import UserFilter from "../utility/UserFilter"
 import { Button, Drawer, Form, Space, Tag, theme } from "antd"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import CreateUserForm from "../forms/users/CreateUserForm";
 import { CreateTenantData, CreateUserData } from "../../types/login.types";
 import { debounce } from "lodash";
@@ -17,6 +17,7 @@ const Users = () => {
 
     const [form] = Form.useForm()
     const queryClient = useQueryClient()
+    const [editingUser, setEditingUser] = useState<DataType | null>(null)
 
     const [queryParams, setQueryParams] = useState({
         currentPage: 1, perPage: PAGE_SIZE, qTerm: "", role: ""
@@ -30,9 +31,28 @@ const Users = () => {
         }
     })
 
+    const { mutate: editUserMutate } = useMutation({
+        mutationKey: ['editUser'],
+        mutationFn: (userData: CreateUserData) => {
+            console.log(userData)
+            return updateUser(userData)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['user-list'] })
+        }
+    })
+
     const handleFormSubmit = async () => {
         await form.validateFields()
-        createUserMutate(form.getFieldsValue())
+
+
+        if (editingUser) {
+            console.log('inside')
+            editUserMutate({ ...form.getFieldsValue(), id: editingUser.id })
+        } else {
+            createUserMutate(form.getFieldsValue())
+        }
+
         onClose()
     }
 
@@ -50,6 +70,7 @@ const Users = () => {
         },
     })
 
+
     const [open, setOpen] = useState(false);
 
     const showDrawer = () => {
@@ -58,8 +79,16 @@ const Users = () => {
 
     const onClose = () => {
         form.resetFields()
+        setEditingUser(null)
         setOpen(false);
     };
+
+    useEffect(() => {
+        if (editingUser) {
+            showDrawer()
+            form.setFieldsValue({ ...editingUser, tenant: editingUser?.tenant?.id })
+        }
+    }, [editingUser, form])
 
     const debouncedQueryUpdate = useMemo(() => {
         return debounce((key: string, value: string) => {
@@ -89,10 +118,21 @@ const Users = () => {
 
             <div className="mt-5">
                 <UserFilter showDrawer={showDrawer} getFilterData={getFilterData} />
-                <Table rowKey={"id"} loading={isLoading} className="mt-4" columns={columns}
+                <Table rowKey={"id"} loading={isLoading} className="mt-4"
+                    columns={[...columns, {
+                        title: 'Action',
+                        key: 'action',
+                        dataIndex: 'action',
+                        render: (_: string, user: DataType) => (
+                            <>
+                                <Button onClick={() => setEditingUser(user)} type="link">Edit</Button>
+                            </>
+                        ),
+                    }]}
                     dataSource={data?.data?.users?.users}
                     pagination={
                         {
+                            showTotal: (total: number, range: number[]) => `Showing ${range[0]}-${range[1]} of ${total}`,
                             total: data?.data?.users?.count,
                             pageSize: queryParams.perPage,
                             current: queryParams.currentPage,
@@ -109,7 +149,7 @@ const Users = () => {
             <div>
                 <Drawer
                     destroyOnClose={true}
-                    title="Create a new user"
+                    title={editingUser ? "Edit User" : "Create a new user"}
                     width={600}
                     onClose={(onClose)}
                     open={open}
@@ -130,7 +170,7 @@ const Users = () => {
                 >
 
                     <Form layout="vertical" form={form} >
-                        <CreateUserForm />
+                        <CreateUserForm isEditing={!!editingUser} />
                     </Form>
 
                 </Drawer>

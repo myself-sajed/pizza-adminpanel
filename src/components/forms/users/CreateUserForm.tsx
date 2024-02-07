@@ -1,17 +1,19 @@
 import { Card, Col, Form, Input, Row, Select, Space } from "antd"
 import { Option } from "antd/es/mentions"
 import { roles } from "../../../constants"
-import { getTenants } from "../../../http/api";
+import { getAllTenantList } from "../../../http/api";
 import { useQuery } from "@tanstack/react-query";
 
-const CreateUserForm = () => {
+const CreateUserForm = ({ isEditing = false }: { isEditing: boolean }) => {
 
     const filterOption = (input: string, option?: { label: string; value: string }) =>
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
     const { data, isLoading } = useQuery({
         queryKey: ['tenant-list'],
-        queryFn: () => getTenants(),
+        queryFn: () => {
+            return getAllTenantList()
+        },
     })
 
     return (
@@ -36,18 +38,21 @@ const CreateUserForm = () => {
                         </Row>
                     </Card>
                 </Col>
-                <Col span={24}>
-                    <Card title="Security">
-                        <Row gutter={10}>
-                            <Col span={12}>
-                                <Form.Item name="password" label="Create Password" rules={
-                                    [{ required: true, message: 'Please input a password' }]}>
-                                    <Input />
-                                </Form.Item>
-                            </Col>
-                        </Row>
-                    </Card>
-                </Col>
+                {
+                    !isEditing && <Col span={24}>
+                        <Card title="Security">
+                            <Row gutter={10}>
+                                <Col span={12}>
+                                    <Form.Item name="password" label="Create Password" rules={
+                                        [{ required: true, message: 'Please input a password' }]}>
+                                        <Input />
+                                    </Form.Item>
+                                </Col>
+                            </Row>
+                        </Card>
+                    </Col>
+                }
+
                 <Col span={24}>
                     <Card title="Role">
                         <Row gutter={10}>
@@ -69,7 +74,7 @@ const CreateUserForm = () => {
                             </Col>
                             <Col span={12}>
                                 <Form.Item
-                                    name="tenantId"
+                                    name="tenant"
                                     label="Tenant"
                                     rules={[{ required: true, message: "Select a tenant" }]}
 

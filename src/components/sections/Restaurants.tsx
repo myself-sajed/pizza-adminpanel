@@ -81,6 +81,7 @@ const Restaurants = () => {
                     dataSource={data?.data?.tenants?.tenants}
                     pagination={
                         {
+                            showTotal: (total: number, range: number[]) => `Showing ${range[0]}-${range[1]} of ${total}`,
                             total: data?.data?.tenants?.count,
                             pageSize: queryParams.perPage,
                             current: queryParams.currentPage,

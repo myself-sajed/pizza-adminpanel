@@ -5,13 +5,15 @@ export interface Credentials {
 }
 
 export interface CreateUserData {
+    id: number,
     name: string;
     email: string;
     role: string;
-    tenantId: number;
+    tenant: number;
     password: string;
 }
 export interface CreateTenantData {
+    id: number;
     name: string;
     address: string;
 }
