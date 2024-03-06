@@ -14,7 +14,7 @@ const RestoFilter = ({ getFilterData, showDrawer }: FilterProps) => {
                     <Input onChange={(e) => getFilterData("qTerm", e.target.value)} style={{ width: "100%", }} allowClear={true} prefix={<SearchOutlined className="site-form-item-icon" />} placeholder="Search" />
                 </div>
                 <Button type='primary' icon={<UserAddOutlined />} onClick={showDrawer} >
-                    Create tenat
+                    Create tenant
                 </Button>
             </Flex>
 

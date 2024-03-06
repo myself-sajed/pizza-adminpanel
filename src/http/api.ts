@@ -17,8 +17,10 @@ export const logout = () => api.post("/auth/logout");
 export const getUsers = (tenantId: number, params: string) =>
   api.post(`/user/list?${params}`, { tenantId });
 
-export const createUser = (userData: CreateUserData) =>
-  api.post("/user/create", userData);
+export const createUser = (userData: CreateUserData) => {
+  console.log("USERData :", userData);
+  return api.post("/user/create", userData);
+};
 
 export const updateUser = (userData: CreateUserData) => {
   console.log("called update user");
