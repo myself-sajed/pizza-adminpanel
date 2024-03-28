@@ -5,42 +5,43 @@ import {
   Credentials,
 } from "../types/login.types";
 
-// auth service api calls
+export const AUTH_SERVICE = "/api/auth";
+export const CATALOG_SERVICE = "/api/catalog";
+
+// AUTH SERVICE APIs
 
 export const login = (credentials: Credentials) =>
-  api.post("/auth/login", credentials);
+  api.post(`${AUTH_SERVICE}/auth/login`, credentials);
 
-export const self = () => api.post("/auth/self");
+export const self = () => api.post(`${AUTH_SERVICE}/auth/self`);
 
-export const logout = () => api.post("/auth/logout");
+export const logout = () => api.post(`${AUTH_SERVICE}/auth/logout`);
 
 export const getUsers = (tenantId: number, params: string) =>
-  api.post(`/user/list?${params}`, { tenantId });
+  api.post(`${AUTH_SERVICE}/user/list?${params}`, { tenantId });
 
 export const createUser = (userData: CreateUserData) => {
-  console.log("USERData :", userData);
-  return api.post("/user/create", userData);
+  return api.post(`${AUTH_SERVICE}/user/create`, userData);
 };
 
 export const updateUser = (userData: CreateUserData) => {
-  console.log("called update user");
-  console.log({ userToUpdate: userData?.id, detailsToUpdate: userData });
-  return api.post("/user/update", {
+  return api.post(`${AUTH_SERVICE}/user/update`, {
     userToUpdate: userData?.id,
     detailsToUpdate: userData,
   });
 };
 
 export const getTenants = (query: string) =>
-  api.get(`/tenant/getTenants?${query}`);
+  api.get(`${AUTH_SERVICE}/tenant/getTenants?${query}`);
 
-export const getAllTenantList = () => api.get(`/tenant/getAllTenantList`);
+export const getAllTenantList = () =>
+  api.get(`${AUTH_SERVICE}/tenant/getAllTenantList`);
 
 export const createTenant = (tenantData: CreateTenantData) =>
-  api.post("/tenant/create", tenantData);
+  api.post(`${AUTH_SERVICE}/tenant/create`, tenantData);
 
 export const updateTenant = (tenantDetails: CreateTenantData) =>
-  api.post("/tenant/updateTenant", {
+  api.post(`${AUTH_SERVICE}/tenant/updateTenant`, {
     tenantToUpdate: tenantDetails.id,
     detailsToUpdate: tenantDetails,
   });
