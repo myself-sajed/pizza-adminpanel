@@ -22,3 +22,10 @@ export interface ChooseCategory {
     _id: string;
     name: string;
 }
+
+
+export interface GetProductFilter {
+    isPublish?: boolean;
+    tenantId?: string;
+    categoryId?: string;
+}

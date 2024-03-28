@@ -49,3 +49,6 @@ export const updateTenant = (tenantDetails: CreateTenantData) =>
 // CATALOG SERVICE APIs
 export const getAllCategoryList = () =>
   api.get(`${CATALOG_SERVICE}/categories/getList`);
+
+export const getProductList = () =>
+  api.get(`${CATALOG_SERVICE}/products/getProducts`);
