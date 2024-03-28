@@ -52,7 +52,6 @@ const Restaurants = () => {
     useEffect(() => {
 
         if (editingTenant) {
-            console.log(editingTenant)
             form.setFieldsValue(editingTenant)
             showDrawer()
         }

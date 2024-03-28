@@ -10,7 +10,7 @@ const CreateUserForm = ({ isEditing = false }: { isEditing: boolean }) => {
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
 
     const { data, isLoading } = useQuery({
-        queryKey: ['tenant-list'],
+        queryKey: ['all-tenant-list'],
         queryFn: () => {
             return getAllTenantList()
         },

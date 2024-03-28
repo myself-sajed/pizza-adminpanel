@@ -45,3 +45,7 @@ export const updateTenant = (tenantDetails: CreateTenantData) =>
     tenantToUpdate: tenantDetails.id,
     detailsToUpdate: tenantDetails,
   });
+
+// CATALOG SERVICE APIs
+export const getAllCategoryList = () =>
+  api.get(`${CATALOG_SERVICE}/categories/getList`);
