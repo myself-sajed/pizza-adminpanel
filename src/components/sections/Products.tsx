@@ -3,30 +3,56 @@ import Breds from "../shared/Breds"
 import ProductFilter from "../utility/ProductFilter"
 import { ColumnsType } from "antd/es/table"
 import { useQuery } from "@tanstack/react-query"
-import { PAGE_SIZE } from "../../constants"
-import { useState } from "react"
+import { PAGE_SIZE, roles } from "../../constants"
+import { useMemo, useState } from "react"
 import { getProductList } from "../../http/api"
 import { format } from "date-fns"
+import { useAuthStore } from "../../store"
+import { debounce } from "lodash"
 
 const Products = () => {
+
+
+    const { user } = useAuthStore()
+
     const [queryParams, setQueryParams] = useState({
-        currentPage: 1, perPage: PAGE_SIZE, qTerm: "", role: ""
+        page: 1, limit: PAGE_SIZE,
+        tenantId: user?.role === roles.admin ? "" : user?.tenant?.id ? JSON.stringify(user?.tenant?.id) : "",
+        q: "", isPublish: "", categoryId: "",
     })
 
     const [editingProduct, setEditingProduct] = useState<Product | null>(null)
 
-
-    // const { user } = useAuthStore()
+    editingProduct
 
     const { data: products, isLoading } = useQuery({
         queryKey: ['product-list', queryParams],
         queryFn: () => {
-            // const params = new URLSearchParams(queryParams as unknown as Record<string, string>).toString()
-            return getProductList()
+            const params = new URLSearchParams(queryParams as unknown as Record<string, string>).toString()
+            return getProductList(params)
         },
     })
 
-    console.log(`Products :`, products, editingProduct)
+    const debouncedQueryUpdate = useMemo(() => {
+        return debounce((key: string, value: string) => {
+            setQueryParams((prev) => {
+                return { ...prev, [key]: value || "", page: 1 }
+            })
+        }, 500);
+    }, [])
+
+    const getFilterData = (key: string, value: string) => {
+
+        if (key === 'q') {
+            debouncedQueryUpdate(key, value)
+        } else {
+            setQueryParams((prev) => {
+                return { ...prev, [key]: value || "", page: 1 }
+            })
+        }
+
+
+    }
 
 
     return (
@@ -34,7 +60,7 @@ const Products = () => {
             <Breds items={[{ title: "Home", link: "" }, { title: "Products", link: "null" }]} />
 
             <div className="mt-5">
-                <ProductFilter showDrawer={() => { }} getFilterData={() => { }} />
+                <ProductFilter role={user?.role} showDrawer={() => { }} getFilterData={getFilterData} />
                 <Table rowKey={"id"} loading={isLoading} className="mt-4"
                     columns={[...columns, {
                         title: 'Action',
@@ -50,12 +76,12 @@ const Products = () => {
                     pagination={
                         {
                             showTotal: (total: number, range: number[]) => `Showing ${range[0]}-${range[1]} of ${total}`,
-                            total: products?.data?.count,
-                            pageSize: queryParams.perPage,
-                            current: queryParams.currentPage,
+                            total: products?.data?.total,
+                            pageSize: queryParams.limit,
+                            current: queryParams.page,
                             onChange: (page: number) => {
                                 setQueryParams((prev) => {
-                                    return { ...prev, currentPage: page }
+                                    return { ...prev, page: page }
                                 })
                             }
                         }

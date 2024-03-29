@@ -28,4 +28,6 @@ export interface GetProductFilter {
     isPublish?: boolean;
     tenantId?: string;
     categoryId?: string;
+    limit: string;
+    page?: string;
 }

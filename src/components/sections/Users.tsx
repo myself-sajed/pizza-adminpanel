@@ -34,7 +34,6 @@ const Users = () => {
     const { mutate: editUserMutate } = useMutation({
         mutationKey: ['editUser'],
         mutationFn: (userData: CreateUserData) => {
-            console.log(userData)
             return updateUser(userData)
         },
         onSuccess: () => {
@@ -47,7 +46,6 @@ const Users = () => {
 
 
         if (editingUser) {
-            console.log('inside')
             editUserMutate({ ...form.getFieldsValue(), id: editingUser.id })
         } else {
             createUserMutate(form.getFieldsValue())
