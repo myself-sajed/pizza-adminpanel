@@ -1,4 +1,4 @@
-import { Button, Image, Space, Table, Tag, Typography } from "antd"
+import { Button, Drawer, Form, Image, Space, Table, Tag, Typography, theme } from "antd"
 import Breds from "../shared/Breds"
 import ProductFilter from "../utility/ProductFilter"
 import { ColumnsType } from "antd/es/table"
@@ -9,11 +9,15 @@ import { getProductList } from "../../http/api"
 import { format } from "date-fns"
 import { useAuthStore } from "../../store"
 import { debounce } from "lodash"
+import ProductForm from "../forms/products/ProductForm"
 
 const Products = () => {
 
-
     const { user } = useAuthStore()
+    const { token: { colorBgLayout } } = theme.useToken();
+
+    const [form] = Form.useForm()
+    const [open, setOpen] = useState(false)
 
     const [queryParams, setQueryParams] = useState({
         page: 1, limit: PAGE_SIZE,
@@ -22,8 +26,6 @@ const Products = () => {
     })
 
     const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-
-    editingProduct
 
     const { data: products, isLoading } = useQuery({
         queryKey: ['product-list', queryParams],
@@ -54,14 +56,25 @@ const Products = () => {
 
     }
 
+    const onClose = () => {
+        form.resetFields()
+        setEditingProduct(null)
+        setOpen(false);
+    };
+
+
+    const handleFormSubmit = () => {
+
+        console.log('Form :', form.getFieldsValue())
+    }
 
     return (
         <div>
             <Breds items={[{ title: "Home", link: "" }, { title: "Products", link: "null" }]} />
 
             <div className="mt-5">
-                <ProductFilter role={user?.role} showDrawer={() => { }} getFilterData={getFilterData} />
-                <Table rowKey={"id"} loading={isLoading} className="mt-4"
+                <ProductFilter role={user?.role} showDrawer={() => { setOpen(true) }} getFilterData={getFilterData} />
+                <Table rowKey={"_id"} loading={isLoading} className="mt-4"
                     columns={[...columns, {
                         title: 'Action',
                         key: 'action',
@@ -87,6 +100,36 @@ const Products = () => {
                         }
                     }
                 />
+
+                <div>
+                    <Drawer
+                        destroyOnClose={true}
+                        title={editingProduct ? "Edit product" : "Create a new product"}
+                        width={600}
+                        onClose={(onClose)}
+                        open={open}
+                        styles={{
+                            body: {
+                                paddingBottom: 80,
+                                backgroundColor: colorBgLayout
+                            },
+                        }}
+                        extra={
+                            <Space>
+                                <Button onClick={onClose}>Cancel</Button>
+                                <Button type="primary" onClick={handleFormSubmit} >
+                                    Submit
+                                </Button>
+                            </Space>
+                        }
+                    >
+
+                        <Form layout="vertical" form={form} >
+                            <ProductForm isEditing={!!editingProduct} />
+                        </Form>
+
+                    </Drawer>
+                </div>
             </div>
         </div>
     )
