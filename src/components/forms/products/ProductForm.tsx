@@ -8,7 +8,7 @@ import ProductAttributes from "./ProductAttributes"
 
 const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
 
-    const categoryChange = Form.useWatch('categoryId')
+    const chosenCategory = Form.useWatch('categoryId')
 
     const filterOption = (input: string, option?: { label: string; value: string }) =>
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
@@ -55,7 +55,7 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                                         >
                                             {
                                                 categories?.data.map((category: ChooseCategory) => {
-                                                    return <Select.Option key={category._id} value={category._id}>{category.name}</Select.Option>
+                                                    return <Select.Option key={category._id} value={JSON.stringify(category)}>{category.name}</Select.Option>
                                                 })
                                             }
                                         </Select>
@@ -94,11 +94,11 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                     }
 
                     {
-                        categoryChange && <ProductPricing />
+                        chosenCategory && <ProductPricing chosenCategory={chosenCategory} />
                     }
 
                     {
-                        categoryChange && <ProductAttributes />
+                        chosenCategory && <ProductAttributes chosenCategory={chosenCategory} />
                     }
 
                     <Col span={24}>
@@ -140,6 +140,7 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                                     <Form.Item
                                         name="isPublish"
                                         rules={[{ required: true, message: "Select a tenant" }]}
+                                        initialValue="Yes"
 
                                     >
                                         <Space >
