@@ -53,3 +53,11 @@ export const getAllCategoryList = () =>
 export const getProductList = (params: string) => {
   return api.get(`${CATALOG_SERVICE}/products/getProducts?${params}`);
 };
+
+export const createProduct = (productData: FormData) => {
+  return api.post(`${CATALOG_SERVICE}/products/create`, productData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};

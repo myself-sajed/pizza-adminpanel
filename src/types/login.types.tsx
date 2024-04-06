@@ -59,3 +59,19 @@ export interface Category {
     price: PriceConfiguration;
     attributes: Attributes[];
 }
+
+type ImageFile = {
+    file: File
+}
+
+export interface ProductData {
+    id?: string;
+    name: string;
+    description: string;
+    image: ImageFile;
+    priceConfiguration: string;
+    attributes: string;
+    tenantId: string;
+    categoryId: string;
+    isPublish: string;
+}

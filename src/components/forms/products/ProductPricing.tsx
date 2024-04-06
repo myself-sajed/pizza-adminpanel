@@ -23,7 +23,7 @@ const ProductPricing = ({ chosenCategory }: { chosenCategory: string }) => {
                                             priceValue.availableOptions.map((option) => {
                                                 return <Col span={8} key={option}>
                                                     <Form.Item required label={option}
-                                                        name={["price",
+                                                        name={["priceConfiguration",
                                                             JSON.stringify({
                                                                 priceKey,
                                                                 priceType: priceValue.priceType

@@ -1,4 +1,4 @@
-import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography, Upload } from "antd"
+import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography, Upload, UploadProps } from "antd"
 import { useQuery } from "@tanstack/react-query"
 import { getAllCategoryList, getAllTenantList } from "../../../http/api"
 import { ChooseCategory } from "../../../types/login.types"
@@ -28,6 +28,16 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
             return getAllCategoryList()
         },
     })
+
+    // ANT-d upload config to avoid unnecessary image uploading, which is a default ant-d behaviour
+
+    const uploadProps: UploadProps = {
+        name: 'image',
+        multiple: false,
+        beforeUpload: () => {
+            return false
+        }
+    }
 
 
     return (
@@ -77,7 +87,7 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                                     <Col span={20}>
                                         <Form.Item name="image" label="Upload Product Image" rules={
                                             [{ required: true, message: 'Please choose an image' }]}>
-                                            <Upload
+                                            <Upload {...uploadProps}
                                                 name="image"
                                                 listType="picture-card"
                                             >
@@ -139,9 +149,7 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                                 <Col span={12}>
                                     <Form.Item
                                         name="isPublish"
-                                        rules={[{ required: true, message: "Select a tenant" }]}
                                         initialValue="Yes"
-
                                     >
                                         <Space >
                                             <Switch defaultChecked checkedChildren="Yes" unCheckedChildren="No" />

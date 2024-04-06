@@ -28,7 +28,7 @@ const ProductAttributes = ({ chosenCategory }: { chosenCategory: string }) => {
                                                             ? <Radio.Group name="radio" >
                                                                 {
                                                                     attribute.availableOptions.map((radioOption) => {
-                                                                        return <Radio key={radioOption} value={radioOption}>{radioOption}</Radio>
+                                                                        return <Radio.Button key={radioOption} value={radioOption}>{radioOption}</Radio.Button>
                                                                     })
                                                                 }
                                                             </Radio.Group> : null

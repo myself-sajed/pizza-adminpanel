@@ -2,14 +2,15 @@ import { Button, Drawer, Form, Image, Space, Table, Tag, Typography, theme } fro
 import Breds from "../shared/Breds"
 import ProductFilter from "../utility/ProductFilter"
 import { ColumnsType } from "antd/es/table"
-import { useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { PAGE_SIZE, roles } from "../../constants"
 import { useMemo, useState } from "react"
-import { getProductList } from "../../http/api"
+import { createProduct, getProductList } from "../../http/api"
 import { format } from "date-fns"
 import { useAuthStore } from "../../store"
 import { debounce } from "lodash"
 import ProductForm from "../forms/products/ProductForm"
+import { convertToFormData } from "./convertToFormData"
 
 const Products = () => {
 
@@ -18,6 +19,8 @@ const Products = () => {
 
     const [form] = Form.useForm()
     const [open, setOpen] = useState(false)
+    const queryClient = useQueryClient()
+
 
     const [queryParams, setQueryParams] = useState({
         page: 1, limit: PAGE_SIZE,
@@ -33,6 +36,16 @@ const Products = () => {
             const params = new URLSearchParams(queryParams as unknown as Record<string, string>).toString()
             return getProductList(params)
         },
+    })
+
+
+    const { mutate: createProductMutate, isPending: isPendingProductCreation } = useMutation({
+        mutationKey: ['createProduct'],
+        mutationFn: (productData: FormData) => createProduct(productData),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['product-list'] })
+            onClose()
+        }
     })
 
     const debouncedQueryUpdate = useMemo(() => {
@@ -63,10 +76,52 @@ const Products = () => {
     };
 
 
-    const handleFormSubmit = () => {
+    const handleFormSubmit = async () => {
+        await form.validateFields()
 
-        console.log('Form :', form.getFieldsValue())
+        // getting prices
+        const rawPriceConfiguration = form.getFieldValue('priceConfiguration')
+        const priceConfiguration = Object.entries(rawPriceConfiguration).reduce((acc, [JSONKey, value]) => {
+            const key = JSON.parse(JSONKey);
+
+            return {
+                ...acc,
+                [key.priceKey]: {
+                    priceType: key.priceType,
+                    availableOptions: value,
+                },
+            };
+        }, {});
+
+
+        // getting attributes
+        const rawAttributes = form.getFieldValue('attributes')
+        const attributes = Object.entries(rawAttributes).map(([key, value]) => {
+            return {
+                name: key,
+                value
+            }
+        })
+
+        // getting categoryId
+        const categoryId = JSON.parse(form.getFieldValue('categoryId'))._id
+
+
+        const productObjectData = {
+            ...form.getFieldsValue(),
+            isPublish: form.getFieldValue("isPublish") === "Yes" ? true : false,
+            priceConfiguration,
+            attributes,
+            categoryId
+        }
+
+        const postFormData = convertToFormData(productObjectData)
+        createProductMutate(postFormData)
     }
+
+
+
+
 
     return (
         <div>
@@ -117,7 +172,7 @@ const Products = () => {
                         extra={
                             <Space>
                                 <Button onClick={onClose}>Cancel</Button>
-                                <Button type="primary" onClick={handleFormSubmit} >
+                                <Button loading={isPendingProductCreation} type="primary" onClick={handleFormSubmit} >
                                     Submit
                                 </Button>
                             </Space>
