@@ -1,12 +1,12 @@
-import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography, Upload, UploadProps } from "antd"
+import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography } from "antd"
 import { useQuery } from "@tanstack/react-query"
 import { getAllCategoryList, getAllTenantList } from "../../../http/api"
 import { ChooseCategory } from "../../../types/login.types"
-import { PlusOutlined } from "@ant-design/icons"
 import ProductPricing from "./ProductPricing"
 import ProductAttributes from "./ProductAttributes"
 import { useAuthStore } from "../../../store"
 import { roles } from "../../../constants"
+import ProductImageUpload from "./ProductImageUpload"
 
 const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
 
@@ -32,16 +32,6 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
             return getAllCategoryList()
         },
     })
-
-    // ANT-d upload config to avoid unnecessary image uploading, which is a default ant-d behaviour
-
-    const uploadProps: UploadProps = {
-        name: 'image',
-        multiple: false,
-        beforeUpload: () => {
-            return false
-        }
-    }
 
 
     return (
@@ -89,18 +79,7 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                             <Card title="Product Image">
                                 <Row gutter={10}>
                                     <Col span={20}>
-                                        <Form.Item name="image" label="Upload Product Image" rules={
-                                            [{ required: true, message: 'Please choose an image' }]}>
-                                            <Upload {...uploadProps}
-                                                name="image"
-                                                listType="picture-card"
-                                            >
-                                                <Space direction="vertical">
-                                                    <PlusOutlined />
-                                                    Upload
-                                                </Space>
-                                            </Upload>
-                                        </Form.Item>
+                                        <ProductImageUpload />
                                     </Col>
                                 </Row>
                             </Card>
