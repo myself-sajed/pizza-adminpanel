@@ -61,3 +61,18 @@ export const createProduct = (productData: FormData) => {
     },
   });
 };
+
+export const updateProduct = (
+  productData: FormData,
+  productId: string | undefined
+) => {
+  return api.put(
+    `${CATALOG_SERVICE}/products/update/${productId}`,
+    productData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+};

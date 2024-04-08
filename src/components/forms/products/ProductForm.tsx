@@ -1,4 +1,4 @@
-import { Card, Col, Form, Input, Row, Select, Space, Switch, Typography } from "antd"
+import { Card, Col, Form, FormInstance, Input, Row, Select, Space, Switch, Typography } from "antd"
 import { useQuery } from "@tanstack/react-query"
 import { getAllCategoryList, getAllTenantList } from "../../../http/api"
 import { ChooseCategory } from "../../../types/login.types"
@@ -8,7 +8,7 @@ import { useAuthStore } from "../../../store"
 import { roles } from "../../../constants"
 import ProductImageUpload from "./ProductImageUpload"
 
-const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
+const ProductForm = ({ form }: { form: FormInstance }) => {
 
     const { user } = useAuthStore()
 
@@ -59,7 +59,7 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                                         >
                                             {
                                                 categories?.data.map((category: ChooseCategory) => {
-                                                    return <Select.Option key={category._id} value={JSON.stringify(category)}>{category.name}</Select.Option>
+                                                    return <Select.Option key={category._id} value={category._id}>{category.name}</Select.Option>
                                                 })
                                             }
                                         </Select>
@@ -74,24 +74,21 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                             </Row>
                         </Card>
                     </Col>
+                    <Col span={24}>
+                        <Card title="Product Image">
+                            <Row gutter={10}>
+                                <Col span={20}>
+                                    <ProductImageUpload initialImage={form.getFieldValue("image")} />
+                                </Col>
+                            </Row>
+                        </Card>
+                    </Col>
                     {
-                        !isEditing && <Col span={24}>
-                            <Card title="Product Image">
-                                <Row gutter={10}>
-                                    <Col span={20}>
-                                        <ProductImageUpload />
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </Col>
+                        chosenCategory && <ProductPricing categoryList={categories?.data} chosenCategory={chosenCategory} />
                     }
 
                     {
-                        chosenCategory && <ProductPricing chosenCategory={chosenCategory} />
-                    }
-
-                    {
-                        chosenCategory && <ProductAttributes chosenCategory={chosenCategory} />
+                        chosenCategory && <ProductAttributes categoryList={categories?.data} chosenCategory={chosenCategory} />
                     }
 
                     {
@@ -115,7 +112,7 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                                                 options={
                                                     tenants?.data?.tenants?.map((item: { name: string, id: number }) => {
                                                         return {
-                                                            value: item.id,
+                                                            value: String(item.id),
                                                             label: item.name
                                                         }
                                                     })
@@ -132,15 +129,18 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                     <Col span={24}>
                         <Card title="Other Properties">
                             <Row gutter={10}>
-                                <Col span={12}>
-                                    <Form.Item
-                                        name="isPublish"
-                                        initialValue="Yes"
-                                    >
-                                        <Space >
-                                            <Switch defaultChecked checkedChildren="Yes" unCheckedChildren="No" />
-                                            <Typography.Text >Publish</Typography.Text>
-                                        </Space>
+                                <Col span={16}>
+                                    <Typography.Text >Do you want to Publish the product?</Typography.Text>
+
+                                    <Form.Item name="isPublish">
+
+                                        <Switch
+                                            defaultChecked={false}
+                                            onChange={() => { }}
+                                            checkedChildren="Yes"
+                                            unCheckedChildren="No"
+                                        />
+
                                     </Form.Item>
                                 </Col>
                             </Row>

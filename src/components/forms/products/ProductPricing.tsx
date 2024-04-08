@@ -1,9 +1,9 @@
 import { Card, Col, Form, InputNumber, Row, Space, Typography } from "antd"
 import { Category } from "../../../types/login.types"
 
-const ProductPricing = ({ chosenCategory }: { chosenCategory: string }) => {
+const ProductPricing = ({ chosenCategory, categoryList }: { chosenCategory: string, categoryList: Category[] | undefined }) => {
 
-    const category: Category | null = chosenCategory ? JSON.parse(chosenCategory) : null
+    const category: Category | null | undefined = categoryList?.find(c => c._id === chosenCategory)
 
     if (!category) {
         return null

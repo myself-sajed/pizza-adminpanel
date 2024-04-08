@@ -4,13 +4,14 @@ import ProductFilter from "../utility/ProductFilter"
 import { ColumnsType } from "antd/es/table"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { PAGE_SIZE, roles } from "../../constants"
-import { useMemo, useState } from "react"
-import { createProduct, getProductList } from "../../http/api"
+import { useEffect, useMemo, useState } from "react"
+import { createProduct, getProductList, updateProduct } from "../../http/api"
 import { format } from "date-fns"
 import { useAuthStore } from "../../store"
 import { debounce } from "lodash"
 import ProductForm from "../forms/products/ProductForm"
 import { convertToFormData } from "./convertToFormData"
+import { Attributes, PriceConfiguration } from "../../types/login.types"
 
 const Products = () => {
 
@@ -39,9 +40,15 @@ const Products = () => {
     })
 
 
-    const { mutate: createProductMutate, isPending: isPendingProductCreation } = useMutation({
+    const { mutate: createUpdateProductMutate, isPending: isPendingProductCreation } = useMutation({
         mutationKey: ['createProduct'],
-        mutationFn: (productData: FormData) => createProduct(productData),
+        mutationFn: (productData: FormData) => {
+            if (editingProduct) {
+                return updateProduct(productData, editingProduct._id)
+            } else {
+                return createProduct(productData)
+            }
+        },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ['product-list'] })
             onClose()
@@ -75,6 +82,10 @@ const Products = () => {
         setOpen(false);
     };
 
+    const showDrawer = () => {
+        setOpen(true);
+    }
+
 
     const handleFormSubmit = async () => {
         await form.validateFields()
@@ -104,12 +115,12 @@ const Products = () => {
         })
 
         // getting categoryId
-        const categoryId = JSON.parse(form.getFieldValue('categoryId'))._id
+        const categoryId = form.getFieldValue('categoryId')
 
 
         const productObjectData = {
             ...form.getFieldsValue(),
-            isPublish: form.getFieldValue("isPublish") === "Yes" ? true : false,
+            isPublish: form.getFieldValue("isPublish") ? true : false,
             tenantId: user?.role === roles.admin ? form.getFieldValue("tenantId") : user?.tenant.id,
             priceConfiguration,
             attributes,
@@ -117,8 +128,39 @@ const Products = () => {
         }
 
         const postFormData = convertToFormData(productObjectData)
-        createProductMutate(postFormData)
+
+
+        createUpdateProductMutate(postFormData)
+
     }
+
+    useEffect(() => {
+        if (editingProduct) {
+            showDrawer()
+
+
+            // 1. prices reversion
+            const priceConfiguration = Object.entries(editingProduct.priceConfiguration).reduce((acc, [key, value]) => {
+                return {
+                    ...acc,
+                    [JSON.stringify({ priceKey: key, priceType: value.priceType })]: value.availableOptions
+                }
+            }, {})
+
+
+
+            // 2. attributes reversion
+            const attributes = editingProduct.attributes.reduce((acc, item) => {
+                return {
+                    ...acc,
+                    [item.name]: item.value
+                }
+            }, {})
+
+            form.setFieldsValue({ ...editingProduct, priceConfiguration, attributes })
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editingProduct])
 
 
 
@@ -181,7 +223,7 @@ const Products = () => {
                     >
 
                         <Form layout="vertical" form={form} >
-                            <ProductForm isEditing={!!editingProduct} />
+                            <ProductForm form={form} />
                         </Form>
 
                     </Drawer>
@@ -194,13 +236,17 @@ const Products = () => {
 export default Products
 
 export interface Product {
-    _id: number;
+    _id: string;
     key: string;
     name: string;
     isPublish: number;
     createdAt: string;
     description: string;
     image: string;
+    tenantId: string;
+    categoryId: string;
+    priceConfiguration: PriceConfiguration,
+    attributes: Attributes[]
 }
 
 const columns: ColumnsType<Product> = [

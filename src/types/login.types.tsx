@@ -45,6 +45,7 @@ export interface Attributes {
     widgetType: widgetType;
     defaultValue: string;
     availableOptions: string[];
+    value?: string
 }
 
 export interface PriceConfiguration {
@@ -55,6 +56,7 @@ export interface PriceConfiguration {
 }
 
 export interface Category {
+    _id?: string;
     name: string;
     price: PriceConfiguration;
     attributes: Attributes[];

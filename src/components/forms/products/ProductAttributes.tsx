@@ -1,9 +1,9 @@
 import { Card, Col, Form, Radio, Row, Space, Switch, Typography } from "antd"
 import { Category } from "../../../types/login.types"
 
-const ProductAttributes = ({ chosenCategory }: { chosenCategory: string }) => {
+const ProductAttributes = ({ chosenCategory, categoryList }: { chosenCategory: string, categoryList: Category[] | undefined }) => {
 
-    const category: Category | null = chosenCategory ? JSON.parse(chosenCategory) : null
+    const category: Category | null | undefined = categoryList?.find(c => c._id === chosenCategory)
 
     if (!category) {
         return null
