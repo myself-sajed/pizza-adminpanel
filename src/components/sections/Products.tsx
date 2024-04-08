@@ -110,6 +110,7 @@ const Products = () => {
         const productObjectData = {
             ...form.getFieldsValue(),
             isPublish: form.getFieldValue("isPublish") === "Yes" ? true : false,
+            tenantId: user?.role === roles.admin ? form.getFieldValue("tenantId") : user?.tenant.id,
             priceConfiguration,
             attributes,
             categoryId
@@ -129,7 +130,7 @@ const Products = () => {
 
             <div className="mt-5">
                 <ProductFilter role={user?.role} showDrawer={() => { setOpen(true) }} getFilterData={getFilterData} />
-                <Table rowKey={"_id"} loading={isLoading} className="mt-4"
+                <Table rowKey={"_id"} loading={isLoading || isPendingProductCreation} className="mt-4"
                     columns={[...columns, {
                         title: 'Action',
                         key: 'action',

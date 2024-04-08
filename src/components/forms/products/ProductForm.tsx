@@ -5,8 +5,12 @@ import { ChooseCategory } from "../../../types/login.types"
 import { PlusOutlined } from "@ant-design/icons"
 import ProductPricing from "./ProductPricing"
 import ProductAttributes from "./ProductAttributes"
+import { useAuthStore } from "../../../store"
+import { roles } from "../../../constants"
 
 const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
+
+    const { user } = useAuthStore()
 
     const chosenCategory = Form.useWatch('categoryId')
 
@@ -111,37 +115,40 @@ const ProductForm = ({ isEditing = false }: { isEditing: boolean }) => {
                         chosenCategory && <ProductAttributes chosenCategory={chosenCategory} />
                     }
 
-                    <Col span={24}>
-                        <Card title="Tenant Info">
-                            <Row gutter={10}>
-                                <Col span={24}>
-                                    <Form.Item
-                                        name="tenantId"
-                                        label="Tenant"
-                                        rules={[{ required: true, message: "Select a tenant" }]}
+                    {
+                        user?.role === roles.admin && <Col span={24}>
+                            <Card title="Tenant Info">
+                                <Row gutter={10}>
+                                    <Col span={24}>
+                                        <Form.Item
+                                            name="tenantId"
+                                            label="Tenant"
+                                            rules={[{ required: true, message: "Select a tenant" }]}
 
-                                    >
-                                        <Select
-                                            loading={isLoading}
-                                            showSearch
-                                            allowClear={true}
-                                            placeholder="Select a tenant"
-                                            optionFilterProp="children"
-                                            filterOption={filterOption}
-                                            options={
-                                                tenants?.data?.tenants?.map((item: { name: string, id: number }) => {
-                                                    return {
-                                                        value: item.id,
-                                                        label: item.name
-                                                    }
-                                                })
-                                            }
-                                        />
-                                    </Form.Item>
-                                </Col>
-                            </Row>
-                        </Card>
-                    </Col>
+                                        >
+                                            <Select
+                                                loading={isLoading}
+                                                showSearch
+                                                allowClear={true}
+                                                placeholder="Select a tenant"
+                                                optionFilterProp="children"
+                                                filterOption={filterOption}
+                                                options={
+                                                    tenants?.data?.tenants?.map((item: { name: string, id: number }) => {
+                                                        return {
+                                                            value: item.id,
+                                                            label: item.name
+                                                        }
+                                                    })
+                                                }
+                                            />
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            </Card>
+                        </Col>
+                    }
+
 
                     <Col span={24}>
                         <Card title="Other Properties">
