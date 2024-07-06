@@ -2,6 +2,8 @@
 
 2. PostgreSQL container: "docker run --rm --name pizza-pg-container -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v pizza-pgdata:/var/lib/postgresql/data -p 5432:5432 -d postgres"
 
+# Explain 2: Starts the pizza-pg-container
+
 
 3. For running migration: npm run migration:run -- -d .\src\config\data-source.ts
 
