@@ -7,6 +7,7 @@ import {
 
 export const AUTH_SERVICE = "/api/auth";
 export const CATALOG_SERVICE = "/api/catalog";
+export const ORDER_SERVICE = "/api/order";
 
 // AUTH SERVICE APIs
 
@@ -52,6 +53,14 @@ export const getAllCategoryList = () =>
 
 export const getProductList = (params: string) => {
   return api.get(`${CATALOG_SERVICE}/products/getProducts?${params}`);
+};
+
+export const getOrderList = (params: string) => {
+  return api.get(`${ORDER_SERVICE}/order/getAllOrders?${params}`);
+};
+
+export const getSingleAdminOrder = (orderId: string) => {
+  return api.post(`${ORDER_SERVICE}/order/getSingleAdminOrder`, { orderId });
 };
 
 export const createProduct = (productData: FormData) => {

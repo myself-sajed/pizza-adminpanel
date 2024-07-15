@@ -7,6 +7,8 @@ import Root from "./pages/Root";
 import Users from "./components/sections/Users";
 import Restaurants from "./components/sections/Restaurants";
 import Products from "./components/sections/Products";
+import Orders from "./components/sections/Orders";
+import OrderDetails from "./components/sections/OrderDetails";
 
 export const router = createBrowserRouter([
     {
@@ -32,6 +34,14 @@ export const router = createBrowserRouter([
                     {
                         path: '/products',
                         element: <Products />
+                    },
+                    {
+                        path: '/orders',
+                        element: <Orders />
+                    },
+                    {
+                        path: '/order/:orderId',
+                        element: <OrderDetails />
                     },
                     {
                         path: '/promos',

@@ -4,6 +4,15 @@ export interface Credentials {
     remember: boolean;
 }
 
+export const orderStatusColors = {
+    "Received": 'yellow',
+    "Confirmed": 'orange',
+    "Prepared": 'blue',
+    "Out for delivery": 'sky',
+    "Delivered": 'green',
+    "Failed": 'red',
+}
+
 export interface CreateUserData {
     id: number,
     name: string;

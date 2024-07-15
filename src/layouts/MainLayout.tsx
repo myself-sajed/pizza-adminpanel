@@ -15,6 +15,7 @@ import useLogout from "../hooks/useLogout"
 import { BellFilled, UserOutlined } from "@ant-design/icons"
 import { useState } from "react"
 import { roles } from "../constants"
+import { OrderIcon } from "../components/icons/OrderIcon"
 
 
 const MainLayout = () => {
@@ -137,6 +138,12 @@ const getMenuItems = (role: string) => {
       key: "/restaurants",
       icon: <Icon component={FoodIcon} />,
       label: <NavLink to={"/restaurants"}>Restaurants</NavLink>,
+    },
+    {
+      id: 4,
+      key: "/orders",
+      icon: <Icon component={OrderIcon} />,
+      label: <NavLink to={"/orders"}>Orders</NavLink>,
     },
   ]
 
