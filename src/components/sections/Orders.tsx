@@ -116,7 +116,7 @@ export interface CartItem {
 export interface Order {
     _id: string
     cart: CartItem[];
-    customerId: string;
+    customerId: { name: string, email: string };
     customer: {
         name: string;
         email: string;
@@ -133,6 +133,7 @@ export interface Order {
     paymentStatus: PaymentStatus;
     orderStatus: OrderStatus;
     paymentId?: string;
+    createdAt?: Date;
 }
 
 
