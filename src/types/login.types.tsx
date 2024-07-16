@@ -8,7 +8,7 @@ export const orderStatusColors = {
     "Received": 'yellow',
     "Confirmed": 'orange',
     "Prepared": 'blue',
-    "Out for delivery": 'sky',
+    "Out for delivery": 'pink',
     "Delivered": 'green',
     "Failed": 'red',
 }

@@ -63,6 +63,13 @@ export const getSingleAdminOrder = (orderId: string) => {
   return api.post(`${ORDER_SERVICE}/order/getSingleAdminOrder`, { orderId });
 };
 
+export const changeOrderStatus = (orderId: string, orderStatus: string) => {
+  return api.post(`${ORDER_SERVICE}/order/changeOrderStatus`, {
+    orderId,
+    orderStatus,
+  });
+};
+
 export const createProduct = (productData: FormData) => {
   return api.post(`${CATALOG_SERVICE}/products/create`, productData, {
     headers: {
