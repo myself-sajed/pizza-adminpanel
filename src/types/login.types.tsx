@@ -86,3 +86,11 @@ export interface ProductData {
     categoryId: string;
     isPublish: string;
 }
+
+export const KafkaOrderEventTypes = {
+    ORDER_CREATED: "ORDER_CREATED",
+    ORDER_PAYMENT_FAILED: "ORDER_PAYMENT_FAILED",
+    ORDER_PAYMENT_PENDING: "ORDER_PAYMENT_PENDING",
+    PAYMENT_STATUS_UPDATED: "PAYMENT_STATUS_UPDATED",
+    ORDER_STATUS_UPDATED: "ORDER_STATUS_UPDATED",
+};

@@ -94,6 +94,14 @@ export interface CartItem
   totalPrice: number;
 }
 
+export interface OldOrders {
+  data: {
+    data: {
+      data: Order[];
+    };
+  };
+}
+
 export const TAXES = 12;
 export const DELIVERY_CHARGE = 50;
 

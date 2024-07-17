@@ -1,23 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Space, Table, Tag, Typography, } from "antd"
+import { message, Space, Table, Tag, Typography, } from "antd"
 import Breds from "../shared/Breds"
 import { ColumnsType } from "antd/es/table"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { PAGE_SIZE, roles } from "../../constants"
 import { useEffect, useMemo, useState } from "react"
 import { getOrderList } from "../../http/api"
 import { format } from "date-fns"
 import { useAuthStore } from "../../store"
 import { debounce } from "lodash"
-import { Address, OrderStatus, PaymentMode, PaymentStatus, ProductConfiguration, Topping } from "../../types/order"
+import { Address, OldOrders, OrderStatus, PaymentMode, PaymentStatus, ProductConfiguration, Topping } from "../../types/order"
 import OrderFilter from "../utility/OrderFilter"
-import { orderStatusColors } from "../../types/login.types"
+import { KafkaOrderEventTypes, orderStatusColors } from "../../types/login.types"
 import { Link } from "react-router-dom"
 import socket from "../../lib/socket"
 
 const Orders = () => {
 
     const { user } = useAuthStore()
+    const queryClient = useQueryClient()
+    const [messageApi, contextHolder] = message.useMessage();
 
 
     const [queryParams, setQueryParams] = useState({
@@ -67,7 +69,30 @@ const Orders = () => {
         if (user?.tenant.id) {
 
             socket.on('new-order', (order) => {
-                console.log("new order:", order)
+                if (order.event_type === KafkaOrderEventTypes.ORDER_CREATED) {
+                    queryClient.setQueryData(['order-list', queryParams], (old: OldOrders) => {
+                        if (!old) {
+                            // Handle the case where old data might be undefined or null
+                            return { data: { data: { data: [order.data] } } };
+                        }
+
+                        // Ensure the data structure is preserved and the new order is added
+                        const newOrders = [order.data, ...old.data.data.data];
+
+                        return {
+                            ...old,
+                            data: {
+                                ...old.data,
+                                data: {
+                                    ...old.data.data,
+                                    data: newOrders
+                                }
+                            }
+                        };
+                    });
+
+                    messageApi.success('Hey! You have a new order.');
+                }
             })
 
             socket.on("join", (roomId) => {
@@ -87,6 +112,7 @@ const Orders = () => {
 
     return (
         <div>
+            {contextHolder}
             <Breds items={[{ title: "Home", link: "" }, { title: "Orders", link: "null" }]} />
 
             <div className="mt-5">
@@ -179,7 +205,7 @@ const columns: ColumnsType<Order> = [
         key: 'customer',
         render: (_: string, record: Order) => {
             return <Space>
-                <Typography.Text >{record.customer.name}</Typography.Text>
+                <Typography.Text >{record?.customer?.name || record?.customerId?.name}</Typography.Text>
             </Space>
         },
     },
