@@ -4,7 +4,7 @@ import Breds from "../shared/Breds"
 import { ColumnsType } from "antd/es/table"
 import { useQuery } from "@tanstack/react-query"
 import { PAGE_SIZE, roles } from "../../constants"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { getOrderList } from "../../http/api"
 import { format } from "date-fns"
 import { useAuthStore } from "../../store"
@@ -13,6 +13,7 @@ import { Address, OrderStatus, PaymentMode, PaymentStatus, ProductConfiguration,
 import OrderFilter from "../utility/OrderFilter"
 import { orderStatusColors } from "../../types/login.types"
 import { Link } from "react-router-dom"
+import socket from "../../lib/socket"
 
 const Orders = () => {
 
@@ -59,6 +60,29 @@ const Orders = () => {
 
 
     }
+
+
+    useEffect(() => {
+
+        if (user?.tenant.id) {
+
+            socket.on('new-order', (order) => {
+                console.log("new order:", order)
+            })
+
+            socket.on("join", (roomId) => {
+                console.log("Joined in", roomId);
+            })
+
+            socket.emit("join", { tenantId: user?.tenant.id })
+        }
+
+        return () => {
+            socket.off("join")
+            socket.off("new-order")
+        }
+
+    })
 
 
     return (
