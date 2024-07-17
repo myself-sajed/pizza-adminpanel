@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 import Breds from "../shared/Breds"
-import { useQuery } from "@tanstack/react-query"
-import { getSingleAdminOrder } from "../../http/api"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { changeOrderStatus, getSingleAdminOrder } from "../../http/api"
 import Loading from "../shared/Loading"
 import { CartItem, Order } from "./Orders"
 import { Card, Col, Descriptions, DescriptionsProps, Select, Tag } from "antd"
@@ -12,16 +12,28 @@ const OrderDetails = () => {
 
     const { orderId } = useParams()
     const navigate = useNavigate()
-
     if (!orderId) {
         navigate(-1)
     }
 
-    const { data: order, isLoading } = useQuery({
+    const { data: order, isLoading, refetch } = useQuery({
         queryKey: [`SingleOrderAdmin`, orderId],
         queryFn: () => getSingleAdminOrder(orderId!).then(res => res.data as { status: string, message: string, order: Order }),
         refetchInterval: 1000 * 15,
         enabled: !!orderId
+    })
+
+    const { mutate: orderStateMutate, isPending } = useMutation({
+        mutationKey: ['update-order-status'],
+        mutationFn: (orderStatus: string) => {
+            return changeOrderStatus(orderId!, orderStatus)
+        },
+        onSuccess: (data) => {
+            if (data.data.status === "success") {
+                refetch()
+            }
+        }
+
     })
 
     const customerDetails: DescriptionsProps['items'] = order?.order ? [
@@ -68,8 +80,9 @@ const OrderDetails = () => {
     ] : []
 
     const handleStatusChange = async (status: string) => {
-        console.log(status)
+        orderStateMutate(status)
     }
+
 
     return (
         <div>
@@ -77,7 +90,7 @@ const OrderDetails = () => {
 
             <div className="mt-5">
                 {
-                    isLoading ? <Loading title="Fetching order details" />
+                    isLoading || isPending ? <Loading title="Fetching order details" />
                         : order?.status === "error"
                             ? <div className="my-5 text-center">
                                 <p className="text-red-600">{order?.message}</p>
@@ -95,7 +108,7 @@ const OrderDetails = () => {
 
                                                                 <div className="flex-1">
                                                                     <p className='font-medium text-xl'>{cartItem.name}</p>
-                                                                    <p className='text-gray-500 sm:text-sm text-xs'>{cartItem?.productConfiguration ? Object.values(cartItem?.productConfiguration).join(', ') : null}</p>
+                                                                    <p className='text-gray-500 sm:text-sm text-xs -mt-4'>{cartItem?.productConfiguration ? Object.values(cartItem?.productConfiguration).join(', ') : null}</p>
                                                                     <p className='text-gray-500 sm:text-sm text-xs'>{cartItem.toppings.map((topping) => topping.name).join(', ')}</p>
                                                                 </div>
                                                                 <span>Qty:<b className="text-lg mx-2">{cartItem.qty}</b></span>
@@ -109,7 +122,7 @@ const OrderDetails = () => {
                                     <Col className="col-span-3">
                                         <Card title="Order Details & Actions"
                                             extra={
-                                                <Select onChange={(item) => handleStatusChange(item)} allowClear={true} placeholder="Change Order Status" style={{ width: "100%" }}>
+                                                <Select value={order?.order?.orderStatus} onChange={(item) => handleStatusChange(item)} placeholder="Change Order Status" style={{ width: "180px", borderWidth: '2px', borderColor: orderStatusColors[order?.order.orderStatus as keyof typeof orderStatusColors] }}>
                                                     {
                                                         Object.keys(orderStatusColors).map((item) => {
                                                             return <Select.Option key={item} value={item}>{item}</Select.Option>
