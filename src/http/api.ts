@@ -4,6 +4,7 @@ import {
   CreateUserData,
   Credentials,
 } from "../types/login.types";
+import { Promo } from "../components/sections/Promos";
 
 export const AUTH_SERVICE = "/api/auth";
 export const CATALOG_SERVICE = "/api/catalog";
@@ -53,6 +54,18 @@ export const getAllCategoryList = () =>
 
 export const getProductList = (params: string) => {
   return api.get(`${CATALOG_SERVICE}/products/getProducts?${params}`);
+};
+
+export const getPromosList = (params: string) => {
+  return api.get(`${ORDER_SERVICE}/coupon/getAllCoupons?${params}`);
+};
+
+export const updatePromo = (data: Promo) => {
+  return api.patch(`${ORDER_SERVICE}/coupon/update`, data);
+};
+
+export const createPromo = (data: Promo) => {
+  return api.post(`${ORDER_SERVICE}/coupon/create`, data);
 };
 
 export const getOrderList = (params: string) => {

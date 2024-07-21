@@ -3,8 +3,9 @@ import { Option } from "antd/es/mentions"
 import { roles } from "../../../constants"
 import { getAllTenantList } from "../../../http/api";
 import { useQuery } from "@tanstack/react-query";
+import { UserInfo } from "../../../store";
 
-const CreateUserForm = ({ isEditing = false }: { isEditing: boolean }) => {
+const CreateUserForm = ({ isEditing = false, user }: { isEditing: boolean, user: UserInfo }) => {
 
     const filterOption = (input: string, option?: { label: string; value: string }) =>
         (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
@@ -56,22 +57,23 @@ const CreateUserForm = ({ isEditing = false }: { isEditing: boolean }) => {
                 <Col span={24}>
                     <Card title="Role">
                         <Row gutter={10}>
-                            <Col span={12}>
-                                <Form.Item
-                                    name="role"
-                                    label="Role"
-                                    rules={[{ required: true, message: "Select a role" }]}
-                                >
-                                    <Select
-                                        placeholder="Select a role"
-                                        allowClear
+                            {
+                                user.role === roles.admin && <Col span={12}>
+                                    <Form.Item
+                                        name="role"
+                                        label="Role"
+                                        rules={[{ required: true, message: "Select a role" }]}
                                     >
-                                        <Option value={roles.admin}>{roles.admin}</Option>
-                                        <Option value={roles.manager}>{roles.manager}</Option>
-                                        <Option value={roles.customer}>{roles.customer}</Option>
-                                    </Select>
-                                </Form.Item>
-                            </Col>
+                                        <Select
+                                            placeholder="Select a role"
+                                            allowClear
+                                        >
+                                            <Option value={roles.admin}>{roles.admin}</Option>
+                                            <Option value={roles.manager}>{roles.manager}</Option>
+                                        </Select>
+                                    </Form.Item>
+                                </Col>
+                            }
                             <Col span={12}>
                                 <Form.Item
                                     name="tenant"

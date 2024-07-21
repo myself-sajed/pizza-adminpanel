@@ -9,6 +9,7 @@ import Restaurants from "./components/sections/Restaurants";
 import Products from "./components/sections/Products";
 import Orders from "./components/sections/Orders";
 import OrderDetails from "./components/sections/OrderDetails";
+import Promos from "./components/sections/Promos";
 
 export const router = createBrowserRouter([
     {
@@ -45,7 +46,7 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: '/promos',
-                        element: <Dashboard />
+                        element: <Promos />
                     },
                 ]
             },

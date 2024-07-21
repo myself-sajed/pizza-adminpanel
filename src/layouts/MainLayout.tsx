@@ -114,6 +114,12 @@ const baseItems = [
     label: <NavLink to={"/products"}>Products</NavLink>,
   },
   {
+    id: 4,
+    key: "/orders",
+    icon: <Icon component={OrderIcon} />,
+    label: <NavLink to={"/orders"}>Orders</NavLink>,
+  },
+  {
     id: 5,
     key: "/promos",
     icon: <Icon component={GiftIcon} />,
@@ -138,12 +144,6 @@ const getMenuItems = (role: string) => {
       key: "/restaurants",
       icon: <Icon component={FoodIcon} />,
       label: <NavLink to={"/restaurants"}>Restaurants</NavLink>,
-    },
-    {
-      id: 4,
-      key: "/orders",
-      icon: <Icon component={OrderIcon} />,
-      label: <NavLink to={"/orders"}>Orders</NavLink>,
     },
   ]
 

@@ -66,7 +66,7 @@ const Orders = () => {
 
     useEffect(() => {
 
-        if (user?.tenant.id) {
+        if (user?.tenant?.id) {
 
             socket.on('new-order', (order) => {
                 if (order.event_type === KafkaOrderEventTypes.ORDER_CREATED) {
@@ -195,7 +195,7 @@ const columns: ColumnsType<Order> = [
         key: 'orderId',
         render: (_: string, record: Order) => {
             return <Space>
-                <Typography.Text style={{ color: 'orangered' }} >{record._id}</Typography.Text>
+                <Typography.Text style={{ color: 'orangered' }} >{record?._id}</Typography.Text>
             </Space>
         },
     },

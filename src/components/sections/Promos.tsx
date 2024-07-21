@@ -1,59 +1,65 @@
 import Breds from "../shared/Breds"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createUser, getUsers, updateUser } from "../../http/api"
+import { createPromo, getPromosList, updatePromo } from "../../http/api"
 import { useAuthStore } from "../../store"
 import type { ColumnsType } from 'antd/es/table';
 import { PAGE_SIZE, roles } from "../../constants"
 import Table from "antd/es/table"
-import UserFilter from "../utility/UserFilter"
-import { Button, Drawer, Form, Space, Tag, theme } from "antd"
+import { Button, Drawer, Form, Space, theme, Typography } from "antd"
 import { useEffect, useMemo, useState } from "react"
-import CreateUserForm from "../forms/users/CreateUserForm";
-import { CreateTenantData, CreateUserData } from "../../types/login.types";
 import { debounce } from "lodash";
+import PromoFilter from "../utility/PromoFilter";
+import { format } from "date-fns";
+import CreatePromoForm from "../forms/promos/CreatePromoForm";
+import dayjs from "dayjs";
 
 
-const Users = () => {
+const Promos = () => {
+    const { user } = useAuthStore()
 
     const [form] = Form.useForm()
+
     const queryClient = useQueryClient()
-    const [editingUser, setEditingUser] = useState<DataType | null>(null)
+    const [editingPromo, setEditingPromo] = useState<Promo | null>(null)
 
     const [queryParams, setQueryParams] = useState({
-        currentPage: 1, perPage: PAGE_SIZE, qTerm: "", role: ""
+        currentPage: 1, perPage: PAGE_SIZE, q: "", discount: "", tenantId: user?.tenant.id
     })
 
-    const { mutate: createUserMutate } = useMutation({
-        mutationKey: ['createUser'],
-        mutationFn: (userData: CreateUserData) => createUser(userData),
+    const { mutate: createPromoMutate } = useMutation({
+        mutationKey: ['createPromo'],
+        mutationFn: (promoData: Promo) => createPromo(promoData),
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user-list'] })
+            queryClient.invalidateQueries({ queryKey: ['promos-list', queryParams] })
         }
     })
 
     const { mutate: editUserMutate } = useMutation({
-        mutationKey: ['editUser'],
-        mutationFn: (userData: CreateUserData) => {
-            return updateUser(userData)
+        mutationKey: ['editPromo'],
+        mutationFn: (userData: Promo) => {
+            return updatePromo(userData)
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user-list'] })
+            queryClient.invalidateQueries({ queryKey: ['promos-list', queryParams] })
         }
     })
 
     const handleFormSubmit = async () => {
         await form.validateFields()
-
-        const newData: CreateUserData = form.getFieldsValue();
-        if (user?.role === roles.admin) {
-            newData.role = roles.manager
+        const fields = form.getFieldsValue()
+        const data: Promo = {
+            code: fields.code,
+            title: fields.title,
+            discount: fields.discount,
+            tenantId: user?.role === roles.admin ? fields.tenantId : user?.tenant.id,
+            validUpto: fields.validUpto["$d"]
         }
 
-        if (editingUser) {
-            editUserMutate({ ...form.getFieldsValue(), id: editingUser.id })
-        } else {
 
-            createUserMutate(newData)
+        if (editingPromo) {
+            editUserMutate({ ...form.getFieldsValue(), _id: editingPromo._id })
+        } else {
+            createPromoMutate(data)
         }
 
         onClose()
@@ -61,15 +67,14 @@ const Users = () => {
 
 
 
-    const { user } = useAuthStore()
     const { token: { colorBgLayout } } = theme.useToken();
 
 
     const { data, isLoading } = useQuery({
-        queryKey: ['user-list', queryParams],
+        queryKey: ['promos-list', queryParams],
         queryFn: () => {
             const params = new URLSearchParams(queryParams as unknown as Record<string, string>).toString()
-            return getUsers((user?.role === roles.admin ? 0 : Number(user?.tenant.id)), params)
+            return getPromosList(params)
         },
     })
 
@@ -82,16 +87,16 @@ const Users = () => {
 
     const onClose = () => {
         form.resetFields()
-        setEditingUser(null)
+        setEditingPromo(null)
         setOpen(false);
     };
 
     useEffect(() => {
-        if (editingUser) {
+        if (editingPromo) {
             showDrawer()
-            form.setFieldsValue({ ...editingUser, tenant: editingUser?.tenant?.id })
+            form.setFieldsValue({ ...editingPromo, validUpto: dayjs(editingPromo.validUpto, 'dd/mm/yyyy hh:mm') })
         }
-    }, [editingUser, form])
+    }, [editingPromo, form])
 
     const debouncedQueryUpdate = useMemo(() => {
         return debounce((key: string, value: string) => {
@@ -117,22 +122,22 @@ const Users = () => {
 
     return (
         <div>
-            <Breds items={[{ title: "Home", link: "" }, { title: "Users", link: "null" }]} />
+            <Breds items={[{ title: "Home", link: "" }, { title: "Promos", link: "null" }]} />
 
             <div className="mt-5">
-                <UserFilter showDrawer={showDrawer} getFilterData={getFilterData} />
+                <PromoFilter showDrawer={showDrawer} getFilterData={getFilterData} />
                 <Table rowKey={"id"} loading={isLoading} className="mt-4"
                     columns={[...columns, {
                         title: 'Action',
                         key: 'action',
                         dataIndex: 'action',
-                        render: (_: string, user: DataType) => (
+                        render: (_: string, promo: Promo) => (
                             <>
-                                <Button onClick={() => setEditingUser(user)} type="link">Edit</Button>
+                                <Button onClick={() => setEditingPromo(promo)} type="link">Edit</Button>
                             </>
                         ),
                     }]}
-                    dataSource={data?.data?.users?.users}
+                    dataSource={data?.data?.data}
                     pagination={
                         {
                             showTotal: (total: number, range: number[]) => `Showing ${range[0]}-${range[1]} of ${total}`,
@@ -152,7 +157,7 @@ const Users = () => {
             <div>
                 <Drawer
                     destroyOnClose={true}
-                    title={editingUser ? "Edit User" : "Create a new user"}
+                    title={editingPromo ? "Edit promo" : "Create a new promo"}
                     width={600}
                     onClose={(onClose)}
                     open={open}
@@ -173,7 +178,7 @@ const Users = () => {
                 >
 
                     <Form layout="vertical" form={form} >
-                        <CreateUserForm user={user!} isEditing={!!editingUser} />
+                        <CreatePromoForm user={user!} />
                     </Form>
 
                 </Drawer>
@@ -182,56 +187,67 @@ const Users = () => {
     )
 }
 
-export default Users
+export default Promos
 
 
 
 
-interface DataType {
-    id: number;
-    key: string;
-    name: string;
-    email: number;
-    role: string;
-    tenant: CreateTenantData | null
+export interface Promo {
+    _id?: number;
+    key?: string;
+    title: string;
+    code: string;
+    discount: number;
+    validUpto: string;
+    tenantId: string
+    updatedAt?: string
 }
 
-const columns: ColumnsType<DataType> = [
+const columns: ColumnsType<Promo> = [
     {
-        title: 'ID',
-        dataIndex: 'id',
-        key: 'id',
+        title: 'Code',
+        dataIndex: 'code',
+        key: 'code',
+        render: (code) => {
+            return <b>{code}</b>
+        }
     },
     {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-        render: (text) => <a>{text}</a>,
+        title: 'Title',
+        dataIndex: 'title',
+        key: 'title',
     },
     {
-        title: 'Email',
-        dataIndex: 'email',
-        key: 'email',
+        title: 'Discount',
+        dataIndex: 'discount',
+        key: 'discount',
+        render: (discount) => {
+            return <b>{discount}</b>
+        }
     },
     {
-        title: 'Role',
-        key: 'role',
-        dataIndex: 'role',
-        render: (role, { id }) => (
-            <>
-                <Tag color={role === roles.admin ? 'red' : 'blue'} key={id}>
-                    {role}
-                </Tag>
-            </>
+        title: 'Valid Upto',
+        key: 'validUpto',
+        dataIndex: 'validUpto',
+        render: (validUpto) => (
+            <Typography.Text>{format(new Date(validUpto), 'dd/MM/yyyy hh:mm')}</Typography.Text>
+        ),
+    },
+    {
+        title: 'Active From',
+        key: 'updatedAt',
+        dataIndex: 'updatedAt',
+        render: (updatedAt) => (
+            <Typography.Text>{format(new Date(updatedAt), 'dd/MM/yyyy hh:mm')}</Typography.Text>
         ),
     },
     {
         title: 'Restaurant',
-        key: 'tenant',
-        dataIndex: 'tenant',
-        render: (tenant) => (
+        key: 'tenantId',
+        dataIndex: 'tenantId',
+        render: (tenantId) => (
             <>
-                {tenant?.name}
+                {tenantId}
             </>
         ),
     },
