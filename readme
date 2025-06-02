@@ -1,3 +1,5 @@
+Notion Link : https://codersgyan.notion.site/Containerisation-Express-app-ecd8f3c5acf446629acdc67cff4ca55f
+
 1. Auth service container: "docker run --rm -it -v ${PWD}:/usr/src/app -v /usr/src/app/node_modules --env-file ${PWD}/.env -p 5000:5000  auth-service:dev"
 
 2. PostgreSQL container: "docker run --rm --name pizza-pg-container -e POSTGRES_USER=root -e POSTGRES_PASSWORD=root -v pizza-pgdata:/var/lib/postgresql/data -p 5432:5432 -d postgres"
